@@ -1,6 +1,7 @@
 <?php
 // TriCera web interface configuration
-// Adjust these paths for your server deployment
+// To override settings locally, create config.local.php in this directory.
+// That file is gitignored and will not be overwritten by git pull.
 
 $TRICERA_PATH = getenv('TRICERA_PATH') ?: '/path/to/tri';
 $MAX_TIMEOUT = 60;          // max user-requested timeout (seconds)
@@ -19,3 +20,9 @@ $ALLOWED_ARG_PATTERN = '/^-(?:arithMode:[a-z0-9]+|t:\d+|m:\w+|heapModel:[a-z]+|l
     . '|valid-memtrack|valid-memcleanup|splitProperties'
     . '|cpp|cppLight|noPP'
     . '|inv|sol|ssol)$/';
+
+// Load local overrides if present (gitignored)
+$localConfig = __DIR__ . '/config.local.php';
+if (file_exists($localConfig)) {
+    require $localConfig;
+}
