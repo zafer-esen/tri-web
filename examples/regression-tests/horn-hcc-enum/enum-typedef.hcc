@@ -1,0 +1,24 @@
+
+
+typedef enum {
+  A, B, C, NUM
+} E;
+
+void main() {
+  E x;
+  int res;
+
+  assume(x >= 0 && x < NUM);
+
+  switch(x) {
+    case A:
+    case B:
+      res = 5;
+      break;
+    case C:
+      res = 10;
+      break;
+  }
+
+  assert(res <= 100);
+}

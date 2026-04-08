@@ -1,0 +1,1892 @@
+[
+  {
+    "name": "acsl-contracts",
+    "examples": [
+      {
+        "id": "acsl-contracts/contract1",
+        "name": "contract1",
+        "file": "regression-tests/acsl-contracts/contract1.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract10",
+        "name": "contract10",
+        "file": "regression-tests/acsl-contracts/contract10.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract11",
+        "name": "contract11",
+        "file": "regression-tests/acsl-contracts/contract11.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract12",
+        "name": "contract12",
+        "file": "regression-tests/acsl-contracts/contract12.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract13",
+        "name": "contract13",
+        "file": "regression-tests/acsl-contracts/contract13.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract14",
+        "name": "contract14",
+        "file": "regression-tests/acsl-contracts/contract14.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract15",
+        "name": "contract15",
+        "file": "regression-tests/acsl-contracts/contract15.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract16",
+        "name": "contract16",
+        "file": "regression-tests/acsl-contracts/contract16.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract17",
+        "name": "contract17",
+        "file": "regression-tests/acsl-contracts/contract17.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract18",
+        "name": "contract18",
+        "file": "regression-tests/acsl-contracts/contract18.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract19",
+        "name": "contract19",
+        "file": "regression-tests/acsl-contracts/contract19.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract2",
+        "name": "contract2",
+        "file": "regression-tests/acsl-contracts/contract2.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract20",
+        "name": "contract20",
+        "file": "regression-tests/acsl-contracts/contract20.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract21",
+        "name": "contract21",
+        "file": "regression-tests/acsl-contracts/contract21.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract22",
+        "name": "contract22",
+        "file": "regression-tests/acsl-contracts/contract22.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract23",
+        "name": "contract23",
+        "file": "regression-tests/acsl-contracts/contract23.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract24",
+        "name": "contract24",
+        "file": "regression-tests/acsl-contracts/contract24.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract25",
+        "name": "contract25",
+        "file": "regression-tests/acsl-contracts/contract25.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract26",
+        "name": "contract26",
+        "file": "regression-tests/acsl-contracts/contract26.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract27",
+        "name": "contract27",
+        "file": "regression-tests/acsl-contracts/contract27.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract3",
+        "name": "contract3",
+        "file": "regression-tests/acsl-contracts/contract3.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract4",
+        "name": "contract4",
+        "file": "regression-tests/acsl-contracts/contract4.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract5",
+        "name": "contract5",
+        "file": "regression-tests/acsl-contracts/contract5.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract6",
+        "name": "contract6",
+        "file": "regression-tests/acsl-contracts/contract6.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract7",
+        "name": "contract7",
+        "file": "regression-tests/acsl-contracts/contract7.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract8",
+        "name": "contract8",
+        "file": "regression-tests/acsl-contracts/contract8.hcc"
+      },
+      {
+        "id": "acsl-contracts/contract9",
+        "name": "contract9",
+        "file": "regression-tests/acsl-contracts/contract9.hcc"
+      },
+      {
+        "id": "acsl-contracts/struct-field-access-1-true",
+        "name": "struct-field-access-1-true",
+        "file": "regression-tests/acsl-contracts/struct-field-access-1-true.hcc"
+      },
+      {
+        "id": "acsl-contracts/struct-field-access-2-false",
+        "name": "struct-field-access-2-false",
+        "file": "regression-tests/acsl-contracts/struct-field-access-2-false.hcc"
+      },
+      {
+        "id": "acsl-contracts/struct-field-access-3-true",
+        "name": "struct-field-access-3-true",
+        "file": "regression-tests/acsl-contracts/struct-field-access-3-true.hcc"
+      },
+      {
+        "id": "acsl-contracts/struct-field-access-4-false",
+        "name": "struct-field-access-4-false",
+        "file": "regression-tests/acsl-contracts/struct-field-access-4-false.hcc"
+      }
+    ]
+  },
+  {
+    "name": "acsl-standalone",
+    "examples": [
+      {
+        "id": "acsl-standalone/assigns_safe",
+        "name": "assigns_safe",
+        "file": "regression-tests/acsl-standalone/assigns_safe.c"
+      },
+      {
+        "id": "acsl-standalone/assigns_unsafe",
+        "name": "assigns_unsafe",
+        "file": "regression-tests/acsl-standalone/assigns_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/dblptr-assigns_safe",
+        "name": "dblptr-assigns_safe",
+        "file": "regression-tests/acsl-standalone/dblptr-assigns_safe.c"
+      },
+      {
+        "id": "acsl-standalone/dblptr-assigns_unsafe",
+        "name": "dblptr-assigns_unsafe",
+        "file": "regression-tests/acsl-standalone/dblptr-assigns_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/getptr_safe",
+        "name": "getptr_safe",
+        "file": "regression-tests/acsl-standalone/getptr_safe.c"
+      },
+      {
+        "id": "acsl-standalone/getptr_unsafe",
+        "name": "getptr_unsafe",
+        "file": "regression-tests/acsl-standalone/getptr_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/inc_safe",
+        "name": "inc_safe",
+        "file": "regression-tests/acsl-standalone/inc_safe.c"
+      },
+      {
+        "id": "acsl-standalone/inc_unsafe",
+        "name": "inc_unsafe",
+        "file": "regression-tests/acsl-standalone/inc_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/incdec_safe",
+        "name": "incdec_safe",
+        "file": "regression-tests/acsl-standalone/incdec_safe.c"
+      },
+      {
+        "id": "acsl-standalone/incdec_unsafe",
+        "name": "incdec_unsafe",
+        "file": "regression-tests/acsl-standalone/incdec_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/maxptr_safe",
+        "name": "maxptr_safe",
+        "file": "regression-tests/acsl-standalone/maxptr_safe.c"
+      },
+      {
+        "id": "acsl-standalone/maxptr_unsafe",
+        "name": "maxptr_unsafe",
+        "file": "regression-tests/acsl-standalone/maxptr_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/mc91_safe",
+        "name": "mc91_safe",
+        "file": "regression-tests/acsl-standalone/mc91_safe.c"
+      },
+      {
+        "id": "acsl-standalone/mc91_unsafe",
+        "name": "mc91_unsafe",
+        "file": "regression-tests/acsl-standalone/mc91_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/old_safe",
+        "name": "old_safe",
+        "file": "regression-tests/acsl-standalone/old_safe.c"
+      },
+      {
+        "id": "acsl-standalone/old_unsafe",
+        "name": "old_unsafe",
+        "file": "regression-tests/acsl-standalone/old_unsafe.c"
+      },
+      {
+        "id": "acsl-standalone/swap_safe",
+        "name": "swap_safe",
+        "file": "regression-tests/acsl-standalone/swap_safe.c"
+      },
+      {
+        "id": "acsl-standalone/swap_unsafe",
+        "name": "swap_unsafe",
+        "file": "regression-tests/acsl-standalone/swap_unsafe.c"
+      }
+    ]
+  },
+  {
+    "name": "at-expressions",
+    "examples": [
+      {
+        "id": "at-expressions/at-old-01-false",
+        "name": "at-old-01-false",
+        "file": "regression-tests/at-expressions/at-old-01-false.c"
+      },
+      {
+        "id": "at-expressions/at-old-01-true",
+        "name": "at-old-01-true",
+        "file": "regression-tests/at-expressions/at-old-01-true.c"
+      },
+      {
+        "id": "at-expressions/simple-01-false",
+        "name": "simple-01-false",
+        "file": "regression-tests/at-expressions/simple-01-false.c"
+      },
+      {
+        "id": "at-expressions/simple-01-true",
+        "name": "simple-01-true",
+        "file": "regression-tests/at-expressions/simple-01-true.c"
+      }
+    ]
+  },
+  {
+    "name": "horn-bv",
+    "examples": [
+      {
+        "id": "horn-bv/MonadicInv",
+        "name": "MonadicInv",
+        "file": "regression-tests/horn-bv/MonadicInv.hcc"
+      },
+      {
+        "id": "horn-bv/bitwise1",
+        "name": "bitwise1",
+        "file": "regression-tests/horn-bv/bitwise1.hcc"
+      },
+      {
+        "id": "horn-bv/bitwise2",
+        "name": "bitwise2",
+        "file": "regression-tests/horn-bv/bitwise2.hcc"
+      },
+      {
+        "id": "horn-bv/bitwise3",
+        "name": "bitwise3",
+        "file": "regression-tests/horn-bv/bitwise3.hcc"
+      },
+      {
+        "id": "horn-bv/nonlinear2",
+        "name": "nonlinear2",
+        "file": "regression-tests/horn-bv/nonlinear2.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-contract-parsing",
+    "examples": [
+      {
+        "id": "horn-contract-parsing/fib",
+        "name": "fib",
+        "file": "regression-tests/horn-contract-parsing/fib.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-contracts",
+    "examples": [
+      {
+        "id": "horn-contracts/assert",
+        "name": "assert",
+        "file": "regression-tests/horn-contracts/assert.hcc"
+      },
+      {
+        "id": "horn-contracts/contract1",
+        "name": "contract1",
+        "file": "regression-tests/horn-contracts/contract1.hcc"
+      },
+      {
+        "id": "horn-contracts/contract2",
+        "name": "contract2",
+        "file": "regression-tests/horn-contracts/contract2.hcc"
+      },
+      {
+        "id": "horn-contracts/contract2b",
+        "name": "contract2b",
+        "file": "regression-tests/horn-contracts/contract2b.hcc"
+      },
+      {
+        "id": "horn-contracts/contract3",
+        "name": "contract3",
+        "file": "regression-tests/horn-contracts/contract3.hcc"
+      },
+      {
+        "id": "horn-contracts/fib",
+        "name": "fib",
+        "file": "regression-tests/horn-contracts/fib.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-custom-entry",
+        "name": "stackptr-custom-entry",
+        "file": "regression-tests/horn-contracts/stackptr-custom-entry.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-func-dec",
+        "name": "stackptr-func-dec",
+        "file": "regression-tests/horn-contracts/stackptr-func-dec.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-ilp32",
+        "name": "stackptr-ilp32",
+        "file": "regression-tests/horn-contracts/stackptr-ilp32.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-multi-arg",
+        "name": "stackptr-multi-arg",
+        "file": "regression-tests/horn-contracts/stackptr-multi-arg.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-nested-calls",
+        "name": "stackptr-nested-calls",
+        "file": "regression-tests/horn-contracts/stackptr-nested-calls.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-recursion",
+        "name": "stackptr-recursion",
+        "file": "regression-tests/horn-contracts/stackptr-recursion.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-retvalue",
+        "name": "stackptr-retvalue",
+        "file": "regression-tests/horn-contracts/stackptr-retvalue.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr-struct",
+        "name": "stackptr-struct",
+        "file": "regression-tests/horn-contracts/stackptr-struct.hcc"
+      },
+      {
+        "id": "horn-contracts/stackptr",
+        "name": "stackptr",
+        "file": "regression-tests/horn-contracts/stackptr.hcc"
+      },
+      {
+        "id": "horn-contracts/struct-name-bug",
+        "name": "struct-name-bug",
+        "file": "regression-tests/horn-contracts/struct-name-bug.hcc"
+      },
+      {
+        "id": "horn-contracts/takeuchi",
+        "name": "takeuchi",
+        "file": "regression-tests/horn-contracts/takeuchi.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc",
+    "examples": [
+      {
+        "id": "horn-hcc/abort-1",
+        "name": "abort-1",
+        "file": "regression-tests/horn-hcc/abort-1.c"
+      },
+      {
+        "id": "horn-hcc/abort-2",
+        "name": "abort-2",
+        "file": "regression-tests/horn-hcc/abort-2.c"
+      },
+      {
+        "id": "horn-hcc/assert-ite-1",
+        "name": "assert-ite-1",
+        "file": "regression-tests/horn-hcc/assert-ite-1.c"
+      },
+      {
+        "id": "horn-hcc/assert-ite-2",
+        "name": "assert-ite-2",
+        "file": "regression-tests/horn-hcc/assert-ite-2.c"
+      },
+      {
+        "id": "horn-hcc/atomic1",
+        "name": "atomic1",
+        "file": "regression-tests/horn-hcc/atomic1.hcc"
+      },
+      {
+        "id": "horn-hcc/atomic2",
+        "name": "atomic2",
+        "file": "regression-tests/horn-hcc/atomic2.hcc"
+      },
+      {
+        "id": "horn-hcc/atomic3",
+        "name": "atomic3",
+        "file": "regression-tests/horn-hcc/atomic3.hcc"
+      },
+      {
+        "id": "horn-hcc/atomic3b",
+        "name": "atomic3b",
+        "file": "regression-tests/horn-hcc/atomic3b.hcc"
+      },
+      {
+        "id": "horn-hcc/atomic3c",
+        "name": "atomic3c",
+        "file": "regression-tests/horn-hcc/atomic3c.hcc"
+      },
+      {
+        "id": "horn-hcc/atomic3d",
+        "name": "atomic3d",
+        "file": "regression-tests/horn-hcc/atomic3d.hcc"
+      },
+      {
+        "id": "horn-hcc/atomic4",
+        "name": "atomic4",
+        "file": "regression-tests/horn-hcc/atomic4.hcc"
+      },
+      {
+        "id": "horn-hcc/diamond_true-unreach-call1",
+        "name": "diamond_true-unreach-call1",
+        "file": "regression-tests/horn-hcc/diamond_true-unreach-call1.c"
+      },
+      {
+        "id": "horn-hcc/disconnected-assertions",
+        "name": "disconnected-assertions",
+        "file": "regression-tests/horn-hcc/disconnected-assertions.hcc"
+      },
+      {
+        "id": "horn-hcc/down_true-unreach-call.i",
+        "name": "down_true-unreach-call.i",
+        "file": "regression-tests/horn-hcc/down_true-unreach-call.i.c"
+      },
+      {
+        "id": "horn-hcc/extended-decl",
+        "name": "extended-decl",
+        "file": "regression-tests/horn-hcc/extended-decl.hcc"
+      },
+      {
+        "id": "horn-hcc/function-in-assume-assert-1-false",
+        "name": "function-in-assume-assert-1-false",
+        "file": "regression-tests/horn-hcc/function-in-assume-assert-1-false.c"
+      },
+      {
+        "id": "horn-hcc/function-in-assume-assert-1-true",
+        "name": "function-in-assume-assert-1-true",
+        "file": "regression-tests/horn-hcc/function-in-assume-assert-1-true.c"
+      },
+      {
+        "id": "horn-hcc/function-in-assume-assert-2-false",
+        "name": "function-in-assume-assert-2-false",
+        "file": "regression-tests/horn-hcc/function-in-assume-assert-2-false.c"
+      },
+      {
+        "id": "horn-hcc/function-in-assume-assert-2-true",
+        "name": "function-in-assume-assert-2-true",
+        "file": "regression-tests/horn-hcc/function-in-assume-assert-2-true.c"
+      },
+      {
+        "id": "horn-hcc/function-in-assume-assert-3-false",
+        "name": "function-in-assume-assert-3-false",
+        "file": "regression-tests/horn-hcc/function-in-assume-assert-3-false.c"
+      },
+      {
+        "id": "horn-hcc/function-in-assume-assert-3-true",
+        "name": "function-in-assume-assert-3-true",
+        "file": "regression-tests/horn-hcc/function-in-assume-assert-3-true.c"
+      },
+      {
+        "id": "horn-hcc/functions",
+        "name": "functions",
+        "file": "regression-tests/horn-hcc/functions.hcc"
+      },
+      {
+        "id": "horn-hcc/functions2",
+        "name": "functions2",
+        "file": "regression-tests/horn-hcc/functions2.hcc"
+      },
+      {
+        "id": "horn-hcc/inits",
+        "name": "inits",
+        "file": "regression-tests/horn-hcc/inits.hcc"
+      },
+      {
+        "id": "horn-hcc/inits2-opt",
+        "name": "inits2-opt",
+        "file": "regression-tests/horn-hcc/inits2-opt.hcc"
+      },
+      {
+        "id": "horn-hcc/inits2",
+        "name": "inits2",
+        "file": "regression-tests/horn-hcc/inits2.hcc"
+      },
+      {
+        "id": "horn-hcc/inits3",
+        "name": "inits3",
+        "file": "regression-tests/horn-hcc/inits3.hcc"
+      },
+      {
+        "id": "horn-hcc/inits4-explicit",
+        "name": "inits4-explicit",
+        "file": "regression-tests/horn-hcc/inits4-explicit.hcc"
+      },
+      {
+        "id": "horn-hcc/inits4-opt",
+        "name": "inits4-opt",
+        "file": "regression-tests/horn-hcc/inits4-opt.hcc"
+      },
+      {
+        "id": "horn-hcc/inits4",
+        "name": "inits4",
+        "file": "regression-tests/horn-hcc/inits4.hcc"
+      },
+      {
+        "id": "horn-hcc/jumps",
+        "name": "jumps",
+        "file": "regression-tests/horn-hcc/jumps.hcc"
+      },
+      {
+        "id": "horn-hcc/jumps2",
+        "name": "jumps2",
+        "file": "regression-tests/horn-hcc/jumps2.hcc"
+      },
+      {
+        "id": "horn-hcc/jumps3",
+        "name": "jumps3",
+        "file": "regression-tests/horn-hcc/jumps3.hcc"
+      },
+      {
+        "id": "horn-hcc/lazy-eval1",
+        "name": "lazy-eval1",
+        "file": "regression-tests/horn-hcc/lazy-eval1.hcc"
+      },
+      {
+        "id": "horn-hcc/literals",
+        "name": "literals",
+        "file": "regression-tests/horn-hcc/literals.c"
+      },
+      {
+        "id": "horn-hcc/locking",
+        "name": "locking",
+        "file": "regression-tests/horn-hcc/locking.hcc"
+      },
+      {
+        "id": "horn-hcc/loop1",
+        "name": "loop1",
+        "file": "regression-tests/horn-hcc/loop1.hcc"
+      },
+      {
+        "id": "horn-hcc/loop2",
+        "name": "loop2",
+        "file": "regression-tests/horn-hcc/loop2.hcc"
+      },
+      {
+        "id": "horn-hcc/predicates",
+        "name": "predicates",
+        "file": "regression-tests/horn-hcc/predicates.hcc"
+      },
+      {
+        "id": "horn-hcc/predicates2",
+        "name": "predicates2",
+        "file": "regression-tests/horn-hcc/predicates2.hcc"
+      },
+      {
+        "id": "horn-hcc/preprocess-1",
+        "name": "preprocess-1",
+        "file": "regression-tests/horn-hcc/preprocess-1.c"
+      },
+      {
+        "id": "horn-hcc/preprocess-2-assert",
+        "name": "preprocess-2-assert",
+        "file": "regression-tests/horn-hcc/preprocess-2-assert.c"
+      },
+      {
+        "id": "horn-hcc/preprocess-3-assert",
+        "name": "preprocess-3-assert",
+        "file": "regression-tests/horn-hcc/preprocess-3-assert.c"
+      },
+      {
+        "id": "horn-hcc/shadowing-global",
+        "name": "shadowing-global",
+        "file": "regression-tests/horn-hcc/shadowing-global.hcc"
+      },
+      {
+        "id": "horn-hcc/shadowing",
+        "name": "shadowing",
+        "file": "regression-tests/horn-hcc/shadowing.hcc"
+      },
+      {
+        "id": "horn-hcc/static-global",
+        "name": "static-global",
+        "file": "regression-tests/horn-hcc/static-global.c"
+      },
+      {
+        "id": "horn-hcc/static-local-retention-false",
+        "name": "static-local-retention-false",
+        "file": "regression-tests/horn-hcc/static-local-retention-false.c"
+      },
+      {
+        "id": "horn-hcc/static-local-retention-true",
+        "name": "static-local-retention-true",
+        "file": "regression-tests/horn-hcc/static-local-retention-true.c"
+      },
+      {
+        "id": "horn-hcc/static-shadowing-true",
+        "name": "static-shadowing-true",
+        "file": "regression-tests/horn-hcc/static-shadowing-true.c"
+      },
+      {
+        "id": "horn-hcc/ternary-bug",
+        "name": "ternary-bug",
+        "file": "regression-tests/horn-hcc/ternary-bug.c"
+      },
+      {
+        "id": "horn-hcc/test-para1",
+        "name": "test-para1",
+        "file": "regression-tests/horn-hcc/test-para1.hcc"
+      },
+      {
+        "id": "horn-hcc/test-para2",
+        "name": "test-para2",
+        "file": "regression-tests/horn-hcc/test-para2.hcc"
+      },
+      {
+        "id": "horn-hcc/test",
+        "name": "test",
+        "file": "regression-tests/horn-hcc/test.c"
+      },
+      {
+        "id": "horn-hcc/test1",
+        "name": "test1",
+        "file": "regression-tests/horn-hcc/test1.hcc"
+      },
+      {
+        "id": "horn-hcc/test2",
+        "name": "test2",
+        "file": "regression-tests/horn-hcc/test2.hcc"
+      },
+      {
+        "id": "horn-hcc/test2b",
+        "name": "test2b",
+        "file": "regression-tests/horn-hcc/test2b.hcc"
+      },
+      {
+        "id": "horn-hcc/test2c",
+        "name": "test2c",
+        "file": "regression-tests/horn-hcc/test2c.hcc"
+      },
+      {
+        "id": "horn-hcc/test3",
+        "name": "test3",
+        "file": "regression-tests/horn-hcc/test3.hcc"
+      },
+      {
+        "id": "horn-hcc/test4",
+        "name": "test4",
+        "file": "regression-tests/horn-hcc/test4.hcc"
+      },
+      {
+        "id": "horn-hcc/test5",
+        "name": "test5",
+        "file": "regression-tests/horn-hcc/test5.hcc"
+      },
+      {
+        "id": "horn-hcc/test6",
+        "name": "test6",
+        "file": "regression-tests/horn-hcc/test6.hcc"
+      },
+      {
+        "id": "horn-hcc/test7",
+        "name": "test7",
+        "file": "regression-tests/horn-hcc/test7.hcc"
+      },
+      {
+        "id": "horn-hcc/unsigned1",
+        "name": "unsigned1",
+        "file": "regression-tests/horn-hcc/unsigned1.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc-2",
+    "examples": [
+      {
+        "id": "horn-hcc-2/atomic3e",
+        "name": "atomic3e",
+        "file": "regression-tests/horn-hcc-2/atomic3e.hcc"
+      },
+      {
+        "id": "horn-hcc-2/atomic3f",
+        "name": "atomic3f",
+        "file": "regression-tests/horn-hcc-2/atomic3f.hcc"
+      },
+      {
+        "id": "horn-hcc-2/channels-2",
+        "name": "channels-2",
+        "file": "regression-tests/horn-hcc-2/channels-2.hcc"
+      },
+      {
+        "id": "horn-hcc-2/channels-2b",
+        "name": "channels-2b",
+        "file": "regression-tests/horn-hcc-2/channels-2b.hcc"
+      },
+      {
+        "id": "horn-hcc-2/channels-3",
+        "name": "channels-3",
+        "file": "regression-tests/horn-hcc-2/channels-3.hcc"
+      },
+      {
+        "id": "horn-hcc-2/channels",
+        "name": "channels",
+        "file": "regression-tests/horn-hcc-2/channels.hcc"
+      },
+      {
+        "id": "horn-hcc-2/clocks1",
+        "name": "clocks1",
+        "file": "regression-tests/horn-hcc-2/clocks1.hcc"
+      },
+      {
+        "id": "horn-hcc-2/clocks2",
+        "name": "clocks2",
+        "file": "regression-tests/horn-hcc-2/clocks2.hcc"
+      },
+      {
+        "id": "horn-hcc-2/clocks3",
+        "name": "clocks3",
+        "file": "regression-tests/horn-hcc-2/clocks3.hcc"
+      },
+      {
+        "id": "horn-hcc-2/clocks4",
+        "name": "clocks4",
+        "file": "regression-tests/horn-hcc-2/clocks4.hcc"
+      },
+      {
+        "id": "horn-hcc-2/clocks5",
+        "name": "clocks5",
+        "file": "regression-tests/horn-hcc-2/clocks5.hcc"
+      },
+      {
+        "id": "horn-hcc-2/duration1",
+        "name": "duration1",
+        "file": "regression-tests/horn-hcc-2/duration1.hcc"
+      },
+      {
+        "id": "horn-hcc-2/duration2",
+        "name": "duration2",
+        "file": "regression-tests/horn-hcc-2/duration2.hcc"
+      },
+      {
+        "id": "horn-hcc-2/duration3",
+        "name": "duration3",
+        "file": "regression-tests/horn-hcc-2/duration3.hcc"
+      },
+      {
+        "id": "horn-hcc-2/duration3b",
+        "name": "duration3b",
+        "file": "regression-tests/horn-hcc-2/duration3b.hcc"
+      },
+      {
+        "id": "horn-hcc-2/duration3c",
+        "name": "duration3c",
+        "file": "regression-tests/horn-hcc-2/duration3c.hcc"
+      },
+      {
+        "id": "horn-hcc-2/duration3d",
+        "name": "duration3d",
+        "file": "regression-tests/horn-hcc-2/duration3d.hcc"
+      },
+      {
+        "id": "horn-hcc-2/fischer-AB",
+        "name": "fischer-AB",
+        "file": "regression-tests/horn-hcc-2/fischer-AB.hcc"
+      },
+      {
+        "id": "horn-hcc-2/fischer",
+        "name": "fischer",
+        "file": "regression-tests/horn-hcc-2/fischer.hcc"
+      },
+      {
+        "id": "horn-hcc-2/hints",
+        "name": "hints",
+        "file": "regression-tests/horn-hcc-2/hints.hcc"
+      },
+      {
+        "id": "horn-hcc-2/hints2",
+        "name": "hints2",
+        "file": "regression-tests/horn-hcc-2/hints2.hcc"
+      },
+      {
+        "id": "horn-hcc-2/hints3",
+        "name": "hints3",
+        "file": "regression-tests/horn-hcc-2/hints3.hcc"
+      },
+      {
+        "id": "horn-hcc-2/hints4",
+        "name": "hints4",
+        "file": "regression-tests/horn-hcc-2/hints4.hcc"
+      },
+      {
+        "id": "horn-hcc-2/interval-propagator-bug",
+        "name": "interval-propagator-bug",
+        "file": "regression-tests/horn-hcc-2/interval-propagator-bug.hcc"
+      },
+      {
+        "id": "horn-hcc-2/lazy-and-or-bug",
+        "name": "lazy-and-or-bug",
+        "file": "regression-tests/horn-hcc-2/lazy-and-or-bug.hcc"
+      },
+      {
+        "id": "horn-hcc-2/nonlinear1",
+        "name": "nonlinear1",
+        "file": "regression-tests/horn-hcc-2/nonlinear1.hcc"
+      },
+      {
+        "id": "horn-hcc-2/nonlinear2",
+        "name": "nonlinear2",
+        "file": "regression-tests/horn-hcc-2/nonlinear2.hcc"
+      },
+      {
+        "id": "horn-hcc-2/switch1",
+        "name": "switch1",
+        "file": "regression-tests/horn-hcc-2/switch1.hcc"
+      },
+      {
+        "id": "horn-hcc-2/switch2",
+        "name": "switch2",
+        "file": "regression-tests/horn-hcc-2/switch2.hcc"
+      },
+      {
+        "id": "horn-hcc-2/trains",
+        "name": "trains",
+        "file": "regression-tests/horn-hcc-2/trains.hcc"
+      },
+      {
+        "id": "horn-hcc-2/typedef1",
+        "name": "typedef1",
+        "file": "regression-tests/horn-hcc-2/typedef1.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc-array",
+    "examples": [
+      {
+        "id": "horn-hcc-array/array-inside-struct-1",
+        "name": "array-inside-struct-1",
+        "file": "regression-tests/horn-hcc-array/array-inside-struct-1.c"
+      },
+      {
+        "id": "horn-hcc-array/array-of-ptr-1",
+        "name": "array-of-ptr-1",
+        "file": "regression-tests/horn-hcc-array/array-of-ptr-1.c"
+      },
+      {
+        "id": "horn-hcc-array/array-single-alloc",
+        "name": "array-single-alloc",
+        "file": "regression-tests/horn-hcc-array/array-single-alloc.c"
+      },
+      {
+        "id": "horn-hcc-array/dynamic-loop1",
+        "name": "dynamic-loop1",
+        "file": "regression-tests/horn-hcc-array/dynamic-loop1.c"
+      },
+      {
+        "id": "horn-hcc-array/global-struct-array-1",
+        "name": "global-struct-array-1",
+        "file": "regression-tests/horn-hcc-array/global-struct-array-1.c"
+      },
+      {
+        "id": "horn-hcc-array/ilp32-bug-1",
+        "name": "ilp32-bug-1",
+        "file": "regression-tests/horn-hcc-array/ilp32-bug-1.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-global-array-explicit-1",
+        "name": "nondet-global-array-explicit-1",
+        "file": "regression-tests/horn-hcc-array/nondet-global-array-explicit-1.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-global-array-explicit-2",
+        "name": "nondet-global-array-explicit-2",
+        "file": "regression-tests/horn-hcc-array/nondet-global-array-explicit-2.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-global-array-explicit-3",
+        "name": "nondet-global-array-explicit-3",
+        "file": "regression-tests/horn-hcc-array/nondet-global-array-explicit-3.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-global-array-opt-1",
+        "name": "nondet-global-array-opt-1",
+        "file": "regression-tests/horn-hcc-array/nondet-global-array-opt-1.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-global-array-opt-2",
+        "name": "nondet-global-array-opt-2",
+        "file": "regression-tests/horn-hcc-array/nondet-global-array-opt-2.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-global-array-opt-3",
+        "name": "nondet-global-array-opt-3",
+        "file": "regression-tests/horn-hcc-array/nondet-global-array-opt-3.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-static-array-explicit-1",
+        "name": "nondet-static-array-explicit-1",
+        "file": "regression-tests/horn-hcc-array/nondet-static-array-explicit-1.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-static-array-explicit-2",
+        "name": "nondet-static-array-explicit-2",
+        "file": "regression-tests/horn-hcc-array/nondet-static-array-explicit-2.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-static-array-explicit-3",
+        "name": "nondet-static-array-explicit-3",
+        "file": "regression-tests/horn-hcc-array/nondet-static-array-explicit-3.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-static-array-opt-1",
+        "name": "nondet-static-array-opt-1",
+        "file": "regression-tests/horn-hcc-array/nondet-static-array-opt-1.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-static-array-opt-2",
+        "name": "nondet-static-array-opt-2",
+        "file": "regression-tests/horn-hcc-array/nondet-static-array-opt-2.c"
+      },
+      {
+        "id": "horn-hcc-array/nondet-static-array-opt-3",
+        "name": "nondet-static-array-opt-3",
+        "file": "regression-tests/horn-hcc-array/nondet-static-array-opt-3.c"
+      },
+      {
+        "id": "horn-hcc-array/out-of-bounds-line1",
+        "name": "out-of-bounds-line1",
+        "file": "regression-tests/horn-hcc-array/out-of-bounds-line1.c"
+      },
+      {
+        "id": "horn-hcc-array/out-of-bounds-line2",
+        "name": "out-of-bounds-line2",
+        "file": "regression-tests/horn-hcc-array/out-of-bounds-line2.c"
+      },
+      {
+        "id": "horn-hcc-array/out-of-bounds-line3",
+        "name": "out-of-bounds-line3",
+        "file": "regression-tests/horn-hcc-array/out-of-bounds-line3.c"
+      },
+      {
+        "id": "horn-hcc-array/out-of-bounds-line4",
+        "name": "out-of-bounds-line4",
+        "file": "regression-tests/horn-hcc-array/out-of-bounds-line4.c"
+      },
+      {
+        "id": "horn-hcc-array/out-of-bounds-loop",
+        "name": "out-of-bounds-loop",
+        "file": "regression-tests/horn-hcc-array/out-of-bounds-loop.c"
+      },
+      {
+        "id": "horn-hcc-array/pointer-arith-1-safe",
+        "name": "pointer-arith-1-safe",
+        "file": "regression-tests/horn-hcc-array/pointer-arith-1-safe.c"
+      },
+      {
+        "id": "horn-hcc-array/pointer-arith-1-unsafe",
+        "name": "pointer-arith-1-unsafe",
+        "file": "regression-tests/horn-hcc-array/pointer-arith-1-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-array/pointer-arith-2-safe",
+        "name": "pointer-arith-2-safe",
+        "file": "regression-tests/horn-hcc-array/pointer-arith-2-safe.c"
+      },
+      {
+        "id": "horn-hcc-array/pointer-arith-2-unsafe",
+        "name": "pointer-arith-2-unsafe",
+        "file": "regression-tests/horn-hcc-array/pointer-arith-2-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-array/pointer-arith-3-safe",
+        "name": "pointer-arith-3-safe",
+        "file": "regression-tests/horn-hcc-array/pointer-arith-3-safe.c"
+      },
+      {
+        "id": "horn-hcc-array/pointer-arith-3-unsafe",
+        "name": "pointer-arith-3-unsafe",
+        "file": "regression-tests/horn-hcc-array/pointer-arith-3-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-array/simple-alloca-memsafety1",
+        "name": "simple-alloca-memsafety1",
+        "file": "regression-tests/horn-hcc-array/simple-alloca-memsafety1.c"
+      },
+      {
+        "id": "horn-hcc-array/simple-alloca-memsafety2",
+        "name": "simple-alloca-memsafety2",
+        "file": "regression-tests/horn-hcc-array/simple-alloca-memsafety2.c"
+      },
+      {
+        "id": "horn-hcc-array/simple-dynamic-array",
+        "name": "simple-dynamic-array",
+        "file": "regression-tests/horn-hcc-array/simple-dynamic-array.c"
+      },
+      {
+        "id": "horn-hcc-array/simple-global-array",
+        "name": "simple-global-array",
+        "file": "regression-tests/horn-hcc-array/simple-global-array.c"
+      },
+      {
+        "id": "horn-hcc-array/simple-global-memsafety1",
+        "name": "simple-global-memsafety1",
+        "file": "regression-tests/horn-hcc-array/simple-global-memsafety1.c"
+      },
+      {
+        "id": "horn-hcc-array/simple-stack-memsafety1",
+        "name": "simple-stack-memsafety1",
+        "file": "regression-tests/horn-hcc-array/simple-stack-memsafety1.c"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc-enum",
+    "examples": [
+      {
+        "id": "horn-hcc-enum/enum-typedef-X",
+        "name": "enum-typedef-X",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef-X.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum-typedef-bug-1",
+        "name": "enum-typedef-bug-1",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef-bug-1.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum-typedef-bug-2",
+        "name": "enum-typedef-bug-2",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef-bug-2.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum-typedef-pointer",
+        "name": "enum-typedef-pointer",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef-pointer.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum-typedef-pointer2",
+        "name": "enum-typedef-pointer2",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef-pointer2.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum-typedef",
+        "name": "enum-typedef",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum-typedef2",
+        "name": "enum-typedef2",
+        "file": "regression-tests/horn-hcc-enum/enum-typedef2.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum1-trailing-comma",
+        "name": "enum1-trailing-comma",
+        "file": "regression-tests/horn-hcc-enum/enum1-trailing-comma.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum1",
+        "name": "enum1",
+        "file": "regression-tests/horn-hcc-enum/enum1.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum2",
+        "name": "enum2",
+        "file": "regression-tests/horn-hcc-enum/enum2.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum3",
+        "name": "enum3",
+        "file": "regression-tests/horn-hcc-enum/enum3.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum4",
+        "name": "enum4",
+        "file": "regression-tests/horn-hcc-enum/enum4.hcc"
+      },
+      {
+        "id": "horn-hcc-enum/enum5",
+        "name": "enum5",
+        "file": "regression-tests/horn-hcc-enum/enum5.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc-heap",
+    "examples": [
+      {
+        "id": "horn-hcc-heap/free-1-unsafe",
+        "name": "free-1-unsafe",
+        "file": "regression-tests/horn-hcc-heap/free-1-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/free-2-nondet-unsafe",
+        "name": "free-2-nondet-unsafe",
+        "file": "regression-tests/horn-hcc-heap/free-2-nondet-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/free-3-safe",
+        "name": "free-3-safe",
+        "file": "regression-tests/horn-hcc-heap/free-3-safe.c"
+      },
+      {
+        "id": "horn-hcc-heap/free-4-unsafe",
+        "name": "free-4-unsafe",
+        "file": "regression-tests/horn-hcc-heap/free-4-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/free-5-unsafe",
+        "name": "free-5-unsafe",
+        "file": "regression-tests/horn-hcc-heap/free-5-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/heap-guard-bug-1",
+        "name": "heap-guard-bug-1",
+        "file": "regression-tests/horn-hcc-heap/heap-guard-bug-1.c"
+      },
+      {
+        "id": "horn-hcc-heap/heap-guard-bug-2",
+        "name": "heap-guard-bug-2",
+        "file": "regression-tests/horn-hcc-heap/heap-guard-bug-2.c"
+      },
+      {
+        "id": "horn-hcc-heap/illegal-access-001",
+        "name": "illegal-access-001",
+        "file": "regression-tests/horn-hcc-heap/illegal-access-001.c"
+      },
+      {
+        "id": "horn-hcc-heap/illegal-access-002",
+        "name": "illegal-access-002",
+        "file": "regression-tests/horn-hcc-heap/illegal-access-002.c"
+      },
+      {
+        "id": "horn-hcc-heap/inv-compare-zero-bug",
+        "name": "inv-compare-zero-bug",
+        "file": "regression-tests/horn-hcc-heap/inv-compare-zero-bug.c"
+      },
+      {
+        "id": "horn-hcc-heap/list-001-fail",
+        "name": "list-001-fail",
+        "file": "regression-tests/horn-hcc-heap/list-001-fail.c"
+      },
+      {
+        "id": "horn-hcc-heap/list-001",
+        "name": "list-001",
+        "file": "regression-tests/horn-hcc-heap/list-001.c"
+      },
+      {
+        "id": "horn-hcc-heap/list-002-fail",
+        "name": "list-002-fail",
+        "file": "regression-tests/horn-hcc-heap/list-002-fail.c"
+      },
+      {
+        "id": "horn-hcc-heap/list-002",
+        "name": "list-002",
+        "file": "regression-tests/horn-hcc-heap/list-002.c"
+      },
+      {
+        "id": "horn-hcc-heap/mutually-referential-structs-fail",
+        "name": "mutually-referential-structs-fail",
+        "file": "regression-tests/horn-hcc-heap/mutually-referential-structs-fail.c"
+      },
+      {
+        "id": "horn-hcc-heap/mutually-referential-structs-unsafe",
+        "name": "mutually-referential-structs-unsafe",
+        "file": "regression-tests/horn-hcc-heap/mutually-referential-structs-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/mutually-referential-structs",
+        "name": "mutually-referential-structs",
+        "file": "regression-tests/horn-hcc-heap/mutually-referential-structs.c"
+      },
+      {
+        "id": "horn-hcc-heap/opassign-struct",
+        "name": "opassign-struct",
+        "file": "regression-tests/horn-hcc-heap/opassign-struct.c"
+      },
+      {
+        "id": "horn-hcc-heap/opassign",
+        "name": "opassign",
+        "file": "regression-tests/horn-hcc-heap/opassign.c"
+      },
+      {
+        "id": "horn-hcc-heap/postop-struct",
+        "name": "postop-struct",
+        "file": "regression-tests/horn-hcc-heap/postop-struct.c"
+      },
+      {
+        "id": "horn-hcc-heap/postop",
+        "name": "postop",
+        "file": "regression-tests/horn-hcc-heap/postop.c"
+      },
+      {
+        "id": "horn-hcc-heap/preop-struct",
+        "name": "preop-struct",
+        "file": "regression-tests/horn-hcc-heap/preop-struct.c"
+      },
+      {
+        "id": "horn-hcc-heap/preop",
+        "name": "preop",
+        "file": "regression-tests/horn-hcc-heap/preop.c"
+      },
+      {
+        "id": "horn-hcc-heap/simple-arith",
+        "name": "simple-arith",
+        "file": "regression-tests/horn-hcc-heap/simple-arith.c"
+      },
+      {
+        "id": "horn-hcc-heap/simple-struct-2",
+        "name": "simple-struct-2",
+        "file": "regression-tests/horn-hcc-heap/simple-struct-2.c"
+      },
+      {
+        "id": "horn-hcc-heap/simple-struct-fail",
+        "name": "simple-struct-fail",
+        "file": "regression-tests/horn-hcc-heap/simple-struct-fail.c"
+      },
+      {
+        "id": "horn-hcc-heap/simple-struct",
+        "name": "simple-struct",
+        "file": "regression-tests/horn-hcc-heap/simple-struct.c"
+      },
+      {
+        "id": "horn-hcc-heap/sizeof-bug-1-true",
+        "name": "sizeof-bug-1-true",
+        "file": "regression-tests/horn-hcc-heap/sizeof-bug-1-true.c"
+      },
+      {
+        "id": "horn-hcc-heap/sizeof-bug-2-true",
+        "name": "sizeof-bug-2-true",
+        "file": "regression-tests/horn-hcc-heap/sizeof-bug-2-true.c"
+      },
+      {
+        "id": "horn-hcc-heap/stack-array-1-unsafe",
+        "name": "stack-array-1-unsafe",
+        "file": "regression-tests/horn-hcc-heap/stack-array-1-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/stack-array-2-safe",
+        "name": "stack-array-2-safe",
+        "file": "regression-tests/horn-hcc-heap/stack-array-2-safe.c"
+      },
+      {
+        "id": "horn-hcc-heap/stack-array-2-unsafe",
+        "name": "stack-array-2-unsafe",
+        "file": "regression-tests/horn-hcc-heap/stack-array-2-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/stack-ptr-bug-1",
+        "name": "stack-ptr-bug-1",
+        "file": "regression-tests/horn-hcc-heap/stack-ptr-bug-1.c"
+      },
+      {
+        "id": "horn-hcc-heap/stackptr-to-heapptr-double",
+        "name": "stackptr-to-heapptr-double",
+        "file": "regression-tests/horn-hcc-heap/stackptr-to-heapptr-double.c"
+      },
+      {
+        "id": "horn-hcc-heap/stackptr-to-heapptr",
+        "name": "stackptr-to-heapptr",
+        "file": "regression-tests/horn-hcc-heap/stackptr-to-heapptr.c"
+      },
+      {
+        "id": "horn-hcc-heap/struct-chained-ptr-field-1-safe",
+        "name": "struct-chained-ptr-field-1-safe",
+        "file": "regression-tests/horn-hcc-heap/struct-chained-ptr-field-1-safe.c"
+      },
+      {
+        "id": "horn-hcc-heap/struct-chained-ptr-field-1-unsafe",
+        "name": "struct-chained-ptr-field-1-unsafe",
+        "file": "regression-tests/horn-hcc-heap/struct-chained-ptr-field-1-unsafe.c"
+      },
+      {
+        "id": "horn-hcc-heap/struct-ptrfield-1",
+        "name": "struct-ptrfield-1",
+        "file": "regression-tests/horn-hcc-heap/struct-ptrfield-1.c"
+      },
+      {
+        "id": "horn-hcc-heap/swap-1-fail",
+        "name": "swap-1-fail",
+        "file": "regression-tests/horn-hcc-heap/swap-1-fail.c"
+      },
+      {
+        "id": "horn-hcc-heap/swap-1",
+        "name": "swap-1",
+        "file": "regression-tests/horn-hcc-heap/swap-1.c"
+      },
+      {
+        "id": "horn-hcc-heap/swap-2-fail",
+        "name": "swap-2-fail",
+        "file": "regression-tests/horn-hcc-heap/swap-2-fail.c"
+      },
+      {
+        "id": "horn-hcc-heap/swap-2",
+        "name": "swap-2",
+        "file": "regression-tests/horn-hcc-heap/swap-2.c"
+      },
+      {
+        "id": "horn-hcc-heap/swap-3",
+        "name": "swap-3",
+        "file": "regression-tests/horn-hcc-heap/swap-3.c"
+      },
+      {
+        "id": "horn-hcc-heap/typecastSafe-001",
+        "name": "typecastSafe-001",
+        "file": "regression-tests/horn-hcc-heap/typecastSafe-001.c"
+      },
+      {
+        "id": "horn-hcc-heap/typecastUnsafe-001",
+        "name": "typecastUnsafe-001",
+        "file": "regression-tests/horn-hcc-heap/typecastUnsafe-001.c"
+      },
+      {
+        "id": "horn-hcc-heap/unsafe-access-001",
+        "name": "unsafe-access-001",
+        "file": "regression-tests/horn-hcc-heap/unsafe-access-001.c"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc-pointer",
+    "examples": [
+      {
+        "id": "horn-hcc-pointer/basic",
+        "name": "basic",
+        "file": "regression-tests/horn-hcc-pointer/basic.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/cast-stack-heap-01",
+        "name": "cast-stack-heap-01",
+        "file": "regression-tests/horn-hcc-pointer/cast-stack-heap-01.c"
+      },
+      {
+        "id": "horn-hcc-pointer/fields-nested",
+        "name": "fields-nested",
+        "file": "regression-tests/horn-hcc-pointer/fields-nested.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/fields",
+        "name": "fields",
+        "file": "regression-tests/horn-hcc-pointer/fields.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/list-init",
+        "name": "list-init",
+        "file": "regression-tests/horn-hcc-pointer/list-init.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/ptr-to-int-cast",
+        "name": "ptr-to-int-cast",
+        "file": "regression-tests/horn-hcc-pointer/ptr-to-int-cast.c"
+      },
+      {
+        "id": "horn-hcc-pointer/ptrptr-bug-1",
+        "name": "ptrptr-bug-1",
+        "file": "regression-tests/horn-hcc-pointer/ptrptr-bug-1.c"
+      },
+      {
+        "id": "horn-hcc-pointer/ptrptr-bug-2",
+        "name": "ptrptr-bug-2",
+        "file": "regression-tests/horn-hcc-pointer/ptrptr-bug-2.c"
+      },
+      {
+        "id": "horn-hcc-pointer/stack-ptr-fun-ret",
+        "name": "stack-ptr-fun-ret",
+        "file": "regression-tests/horn-hcc-pointer/stack-ptr-fun-ret.c"
+      },
+      {
+        "id": "horn-hcc-pointer/struct-pointer",
+        "name": "struct-pointer",
+        "file": "regression-tests/horn-hcc-pointer/struct-pointer.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/struct-pointer2",
+        "name": "struct-pointer2",
+        "file": "regression-tests/horn-hcc-pointer/struct-pointer2.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/unary-struct-nested",
+        "name": "unary-struct-nested",
+        "file": "regression-tests/horn-hcc-pointer/unary-struct-nested.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/unary-struct",
+        "name": "unary-struct",
+        "file": "regression-tests/horn-hcc-pointer/unary-struct.hcc"
+      },
+      {
+        "id": "horn-hcc-pointer/unary",
+        "name": "unary",
+        "file": "regression-tests/horn-hcc-pointer/unary.hcc"
+      }
+    ]
+  },
+  {
+    "name": "horn-hcc-struct",
+    "examples": [
+      {
+        "id": "horn-hcc-struct/anon",
+        "name": "anon",
+        "file": "regression-tests/horn-hcc-struct/anon.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/assign-exp-eval-order",
+        "name": "assign-exp-eval-order",
+        "file": "regression-tests/horn-hcc-struct/assign-exp-eval-order.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/assign-exp",
+        "name": "assign-exp",
+        "file": "regression-tests/horn-hcc-struct/assign-exp.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/assign-illegal",
+        "name": "assign-illegal",
+        "file": "regression-tests/horn-hcc-struct/assign-illegal.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/assign",
+        "name": "assign",
+        "file": "regression-tests/horn-hcc-struct/assign.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/assign2",
+        "name": "assign2",
+        "file": "regression-tests/horn-hcc-struct/assign2.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/emptyStruct",
+        "name": "emptyStruct",
+        "file": "regression-tests/horn-hcc-struct/emptyStruct.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/init",
+        "name": "init",
+        "file": "regression-tests/horn-hcc-struct/init.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/loop",
+        "name": "loop",
+        "file": "regression-tests/horn-hcc-struct/loop.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/nested",
+        "name": "nested",
+        "file": "regression-tests/horn-hcc-struct/nested.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/race",
+        "name": "race",
+        "file": "regression-tests/horn-hcc-struct/race.hcc"
+      },
+      {
+        "id": "horn-hcc-struct/typedef",
+        "name": "typedef",
+        "file": "regression-tests/horn-hcc-struct/typedef.hcc"
+      }
+    ]
+  },
+  {
+    "name": "interpreted-predicates",
+    "examples": [
+      {
+        "id": "interpreted-predicates/simple-invariant-false",
+        "name": "simple-invariant-false",
+        "file": "regression-tests/interpreted-predicates/simple-invariant-false.c"
+      },
+      {
+        "id": "interpreted-predicates/simple-invariant-true",
+        "name": "simple-invariant-true",
+        "file": "regression-tests/interpreted-predicates/simple-invariant-true.c"
+      },
+      {
+        "id": "interpreted-predicates/simple-loop-invariant-false",
+        "name": "simple-loop-invariant-false",
+        "file": "regression-tests/interpreted-predicates/simple-loop-invariant-false.c"
+      },
+      {
+        "id": "interpreted-predicates/simple-loop-invariant-true",
+        "name": "simple-loop-invariant-true",
+        "file": "regression-tests/interpreted-predicates/simple-loop-invariant-true.c"
+      }
+    ]
+  },
+  {
+    "name": "loop-invariants",
+    "examples": [
+      {
+        "id": "loop-invariants/loop-in-func",
+        "name": "loop-in-func",
+        "file": "regression-tests/loop-invariants/loop-in-func.c"
+      },
+      {
+        "id": "loop-invariants/simple-loop-annotate",
+        "name": "simple-loop-annotate",
+        "file": "regression-tests/loop-invariants/simple-loop-annotate.c"
+      },
+      {
+        "id": "loop-invariants/simple-loop-contract",
+        "name": "simple-loop-contract",
+        "file": "regression-tests/loop-invariants/simple-loop-contract.c"
+      },
+      {
+        "id": "loop-invariants/simple-loop",
+        "name": "simple-loop",
+        "file": "regression-tests/loop-invariants/simple-loop.c"
+      }
+    ]
+  },
+  {
+    "name": "math-arrays",
+    "examples": [
+      {
+        "id": "math-arrays/simple-math-array-1",
+        "name": "simple-math-array-1",
+        "file": "regression-tests/math-arrays/simple-math-array-1.hcc"
+      },
+      {
+        "id": "math-arrays/struct-array",
+        "name": "struct-array",
+        "file": "regression-tests/math-arrays/struct-array.hcc"
+      }
+    ]
+  },
+  {
+    "name": "properties",
+    "examples": [
+      {
+        "id": "properties/valid-deref-arraybounds-1-false",
+        "name": "valid-deref-arraybounds-1-false",
+        "file": "regression-tests/properties/valid-deref-arraybounds-1-false.c"
+      },
+      {
+        "id": "properties/valid-deref-arraybounds-2-false",
+        "name": "valid-deref-arraybounds-2-false",
+        "file": "regression-tests/properties/valid-deref-arraybounds-2-false.c"
+      },
+      {
+        "id": "properties/valid-deref-arraybounds-3-false",
+        "name": "valid-deref-arraybounds-3-false",
+        "file": "regression-tests/properties/valid-deref-arraybounds-3-false.c"
+      },
+      {
+        "id": "properties/valid-deref-arraybounds-3-true",
+        "name": "valid-deref-arraybounds-3-true",
+        "file": "regression-tests/properties/valid-deref-arraybounds-3-true.c"
+      },
+      {
+        "id": "properties/valid-deref-arraybounds-4-false",
+        "name": "valid-deref-arraybounds-4-false",
+        "file": "regression-tests/properties/valid-deref-arraybounds-4-false.c"
+      },
+      {
+        "id": "properties/valid-deref-nullptr-false",
+        "name": "valid-deref-nullptr-false",
+        "file": "regression-tests/properties/valid-deref-nullptr-false.c"
+      },
+      {
+        "id": "properties/valid-deref-uninit-false",
+        "name": "valid-deref-uninit-false",
+        "file": "regression-tests/properties/valid-deref-uninit-false.c"
+      },
+      {
+        "id": "properties/valid-free-1-true",
+        "name": "valid-free-1-true",
+        "file": "regression-tests/properties/valid-free-1-true.c"
+      },
+      {
+        "id": "properties/valid-free-10-true",
+        "name": "valid-free-10-true",
+        "file": "regression-tests/properties/valid-free-10-true.c"
+      },
+      {
+        "id": "properties/valid-free-11-true",
+        "name": "valid-free-11-true",
+        "file": "regression-tests/properties/valid-free-11-true.c"
+      },
+      {
+        "id": "properties/valid-free-12-false",
+        "name": "valid-free-12-false",
+        "file": "regression-tests/properties/valid-free-12-false.c"
+      },
+      {
+        "id": "properties/valid-free-2-false",
+        "name": "valid-free-2-false",
+        "file": "regression-tests/properties/valid-free-2-false.c"
+      },
+      {
+        "id": "properties/valid-free-3-true",
+        "name": "valid-free-3-true",
+        "file": "regression-tests/properties/valid-free-3-true.c"
+      },
+      {
+        "id": "properties/valid-free-4-false",
+        "name": "valid-free-4-false",
+        "file": "regression-tests/properties/valid-free-4-false.c"
+      },
+      {
+        "id": "properties/valid-free-5-false",
+        "name": "valid-free-5-false",
+        "file": "regression-tests/properties/valid-free-5-false.c"
+      },
+      {
+        "id": "properties/valid-free-6-true",
+        "name": "valid-free-6-true",
+        "file": "regression-tests/properties/valid-free-6-true.c"
+      },
+      {
+        "id": "properties/valid-free-7-false",
+        "name": "valid-free-7-false",
+        "file": "regression-tests/properties/valid-free-7-false.c"
+      },
+      {
+        "id": "properties/valid-free-8-false",
+        "name": "valid-free-8-false",
+        "file": "regression-tests/properties/valid-free-8-false.c"
+      },
+      {
+        "id": "properties/valid-free-9-false",
+        "name": "valid-free-9-false",
+        "file": "regression-tests/properties/valid-free-9-false.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-1-false",
+        "name": "valid-memcleanup-1-false",
+        "file": "regression-tests/properties/valid-memcleanup-1-false.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-1-true",
+        "name": "valid-memcleanup-1-true",
+        "file": "regression-tests/properties/valid-memcleanup-1-true.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-2-false",
+        "name": "valid-memcleanup-2-false",
+        "file": "regression-tests/properties/valid-memcleanup-2-false.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-3-false",
+        "name": "valid-memcleanup-3-false",
+        "file": "regression-tests/properties/valid-memcleanup-3-false.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-3-true",
+        "name": "valid-memcleanup-3-true",
+        "file": "regression-tests/properties/valid-memcleanup-3-true.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-4-false",
+        "name": "valid-memcleanup-4-false",
+        "file": "regression-tests/properties/valid-memcleanup-4-false.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-array-false",
+        "name": "valid-memcleanup-array-false",
+        "file": "regression-tests/properties/valid-memcleanup-array-false.c"
+      },
+      {
+        "id": "properties/valid-memcleanup-array-true",
+        "name": "valid-memcleanup-array-true",
+        "file": "regression-tests/properties/valid-memcleanup-array-true.c"
+      },
+      {
+        "id": "properties/valid-memtrack-array-true",
+        "name": "valid-memtrack-array-true",
+        "file": "regression-tests/properties/valid-memtrack-array-true.c"
+      }
+    ]
+  },
+  {
+    "name": "quantifiers",
+    "examples": [
+      {
+        "id": "quantifiers/ext-univ-1-safe",
+        "name": "ext-univ-1-safe",
+        "file": "regression-tests/quantifiers/ext-univ-1-safe.hcc"
+      },
+      {
+        "id": "quantifiers/ext-univ-1-unsafe",
+        "name": "ext-univ-1-unsafe",
+        "file": "regression-tests/quantifiers/ext-univ-1-unsafe.hcc"
+      },
+      {
+        "id": "quantifiers/ext-univ-2-safe",
+        "name": "ext-univ-2-safe",
+        "file": "regression-tests/quantifiers/ext-univ-2-safe.hcc"
+      },
+      {
+        "id": "quantifiers/ext-univ-3-nonzero-lo-safe",
+        "name": "ext-univ-3-nonzero-lo-safe",
+        "file": "regression-tests/quantifiers/ext-univ-3-nonzero-lo-safe.hcc"
+      },
+      {
+        "id": "quantifiers/ext-univ-4-empty-safe",
+        "name": "ext-univ-4-empty-safe",
+        "file": "regression-tests/quantifiers/ext-univ-4-empty-safe.hcc"
+      },
+      {
+        "id": "quantifiers/ext-univ-5-cmpN-safe",
+        "name": "ext-univ-5-cmpN-safe",
+        "file": "regression-tests/quantifiers/ext-univ-5-cmpN-safe.hcc"
+      }
+    ]
+  },
+  {
+    "name": "toh-contract-translation",
+    "examples": [
+      {
+        "id": "toh-contract-translation/get-1",
+        "name": "get-1",
+        "file": "regression-tests/toh-contract-translation/get-1.c"
+      },
+      {
+        "id": "toh-contract-translation/get-2",
+        "name": "get-2",
+        "file": "regression-tests/toh-contract-translation/get-2.c"
+      },
+      {
+        "id": "toh-contract-translation/heapptr-to-stackptr",
+        "name": "heapptr-to-stackptr",
+        "file": "regression-tests/toh-contract-translation/heapptr-to-stackptr.c"
+      },
+      {
+        "id": "toh-contract-translation/incdec-1",
+        "name": "incdec-1",
+        "file": "regression-tests/toh-contract-translation/incdec-1.c"
+      },
+      {
+        "id": "toh-contract-translation/incdec-2",
+        "name": "incdec-2",
+        "file": "regression-tests/toh-contract-translation/incdec-2.c"
+      },
+      {
+        "id": "toh-contract-translation/incdec-3",
+        "name": "incdec-3",
+        "file": "regression-tests/toh-contract-translation/incdec-3.c"
+      },
+      {
+        "id": "toh-contract-translation/max-1",
+        "name": "max-1",
+        "file": "regression-tests/toh-contract-translation/max-1.c"
+      },
+      {
+        "id": "toh-contract-translation/max-2",
+        "name": "max-2",
+        "file": "regression-tests/toh-contract-translation/max-2.c"
+      },
+      {
+        "id": "toh-contract-translation/multadd-1",
+        "name": "multadd-1",
+        "file": "regression-tests/toh-contract-translation/multadd-1.c"
+      },
+      {
+        "id": "toh-contract-translation/multadd-2",
+        "name": "multadd-2",
+        "file": "regression-tests/toh-contract-translation/multadd-2.c"
+      },
+      {
+        "id": "toh-contract-translation/multadd-3",
+        "name": "multadd-3",
+        "file": "regression-tests/toh-contract-translation/multadd-3.c"
+      },
+      {
+        "id": "toh-contract-translation/multi-arg-1",
+        "name": "multi-arg-1",
+        "file": "regression-tests/toh-contract-translation/multi-arg-1.c"
+      },
+      {
+        "id": "toh-contract-translation/multi-arg-2",
+        "name": "multi-arg-2",
+        "file": "regression-tests/toh-contract-translation/multi-arg-2.c"
+      },
+      {
+        "id": "toh-contract-translation/qualified-heapptr-to-stackptr",
+        "name": "qualified-heapptr-to-stackptr",
+        "file": "regression-tests/toh-contract-translation/qualified-heapptr-to-stackptr.c"
+      },
+      {
+        "id": "toh-contract-translation/struct-1",
+        "name": "struct-1",
+        "file": "regression-tests/toh-contract-translation/struct-1.c"
+      },
+      {
+        "id": "toh-contract-translation/truck-1",
+        "name": "truck-1",
+        "file": "regression-tests/toh-contract-translation/truck-1.c"
+      },
+      {
+        "id": "toh-contract-translation/truck-2",
+        "name": "truck-2",
+        "file": "regression-tests/toh-contract-translation/truck-2.c"
+      }
+    ]
+  },
+  {
+    "name": "uninterpreted-predicates",
+    "examples": [
+      {
+        "id": "uninterpreted-predicates/pred-hint-loop",
+        "name": "pred-hint-loop",
+        "file": "regression-tests/uninterpreted-predicates/pred-hint-loop.c"
+      },
+      {
+        "id": "uninterpreted-predicates/pred-hint",
+        "name": "pred-hint",
+        "file": "regression-tests/uninterpreted-predicates/pred-hint.c"
+      },
+      {
+        "id": "uninterpreted-predicates/unint-pred-simple-false",
+        "name": "unint-pred-simple-false",
+        "file": "regression-tests/uninterpreted-predicates/unint-pred-simple-false.c"
+      },
+      {
+        "id": "uninterpreted-predicates/unint-pred-simple-ptr-true",
+        "name": "unint-pred-simple-ptr-true",
+        "file": "regression-tests/uninterpreted-predicates/unint-pred-simple-ptr-true.c"
+      },
+      {
+        "id": "uninterpreted-predicates/unint-pred-simple-true",
+        "name": "unint-pred-simple-true",
+        "file": "regression-tests/uninterpreted-predicates/unint-pred-simple-true.c"
+      },
+      {
+        "id": "uninterpreted-predicates/unint-pred-stack-ptr-unsupported",
+        "name": "unint-pred-stack-ptr-unsupported",
+        "file": "regression-tests/uninterpreted-predicates/unint-pred-stack-ptr-unsupported.c"
+      },
+      {
+        "id": "uninterpreted-predicates/unint-pred-unnamed-ptr-arg-bug",
+        "name": "unint-pred-unnamed-ptr-arg-bug",
+        "file": "regression-tests/uninterpreted-predicates/unint-pred-unnamed-ptr-arg-bug.c"
+      }
+    ]
+  }
+]

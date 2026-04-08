@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TriCera - C Program Verifier</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <span class="logo">TriCera</span>
+      <span class="version">v0.4</span>
+      <select id="examples-select" class="examples-select">
+        <option value="">Load Example...</option>
+      </select>
+    </div>
+    <div class="header-right">
+      <button id="share-btn" class="header-btn" title="Copy share link">Share</button>
+      <button id="toggle-options" class="header-btn" title="Toggle options panel">Options</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="editor-area">
+      <div class="status-bar" id="status-bar"></div>
+      <div id="editor-container"></div>
+      <div class="output-panel" id="output-panel">
+        <div class="output-resize-handle" id="output-resize-handle"></div>
+        <div class="output-header" id="output-header">
+          <div class="output-status" id="output-status"></div>
+          <div class="output-tabs" id="output-tabs">
+            <button class="tab-btn active" data-tab="output">Output</button>
+            <button class="tab-btn" data-tab="acsl" style="display:none">ACSL</button>
+            <button class="tab-btn" data-tab="chcs" style="display:none">CHCs</button>
+            <button class="tab-btn" data-tab="pp" style="display:none">TriCera Preprocessor</button>
+            <button class="tab-btn" data-tab="graph" style="display:none">Graph</button>
+          </div>
+          <button class="output-close" id="output-close" title="Close output panel">&times;</button>
+        </div>
+        <div class="output-body">
+          <pre class="output-content active" id="output-content-output"></pre>
+          <pre class="output-content" id="output-content-acsl"></pre>
+          <pre class="output-content" id="output-content-chcs"></pre>
+          <pre class="output-content" id="output-content-pp"></pre>
+          <div class="output-content" id="output-content-graph"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="options-panel" id="options-panel">
+      <button id="verify-btn" class="verify-btn">Verify</button>
+      <div id="options-container"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+  <script src="js/tricera-language.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/options.js"></script>
+  <script src="js/examples.js"></script>
+  <script src="js/output.js"></script>
+  <script src="js/verify.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

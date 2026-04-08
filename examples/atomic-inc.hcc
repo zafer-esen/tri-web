@@ -1,0 +1,23 @@
+// Two threads atomically increment a shared counter.
+// Thread B checks that if A has finished, x must be 2.
+// Result: SAFE
+
+int x = 0;
+int finished = 0;
+
+thread A {
+  atomic {
+    int t = x;
+    x = t + 1;
+  }
+  finished = 1;
+}
+
+thread B {
+  atomic {
+    int t = x;
+    x = t + 1;
+  }
+  if (finished)
+    assert(x == 2);
+}
