@@ -12,14 +12,34 @@
       <span class="logo">TriCera</span>
       <span class="version">v0.4</span>
       <select id="examples-select" class="examples-select">
-        <option value="">Load Example...</option>
+        <option value="">Load example...</option>
       </select>
     </div>
     <div class="header-right">
+      <button id="help-btn" class="header-btn" title="Show help">Help</button>
       <button id="share-btn" class="header-btn" title="Copy share link">Share</button>
       <button id="toggle-options" class="header-btn" title="Toggle options panel">Options</button>
     </div>
   </header>
+
+  <div class="help-panel" id="help-panel" style="display:none">
+    <div class="help-content">
+      <p><a href="https://github.com/uuverifiers/tricera" target="_blank">TriCera</a>
+        is a model checker for C programs, developed at Uppsala University.</p>
+      <p>TriCera accepts programs in a C-like language, including the keywords:</p>
+      <ul>
+        <li><code>assert(condition)</code> &mdash; verify that a condition holds at this point in the program.</li>
+        <li><code>assume(condition)</code> &mdash; assume that a condition holds.</li>
+        <li><code>atomic { ... }</code> &mdash; execute a block of statements atomically.</li>
+        <li><code>within (cond) { ... }</code> &mdash; execute a block atomically before <code>cond</code> expires (timed automata).</li>
+        <li><code>thread &lt;name&gt; { ... }</code> &mdash; declare a singleton thread.</li>
+        <li><code>thread[&lt;id&gt;] &lt;name&gt; { ... }</code> &mdash; declare an infinitely replicated thread.</li>
+        <li><code>clock</code>, <code>duration</code> &mdash; declare clocks or time period variables.</li>
+        <li><code>chan &lt;name&gt;</code> &mdash; declare a binary communication channel, used via <code>chan_send</code> and <code>chan_receive</code>.</li>
+      </ul>
+      <p>For more information, see the <a href="https://github.com/uuverifiers/tricera" target="_blank">GitHub page</a>.</p>
+    </div>
+  </div>
 
   <div class="main">
     <div class="editor-area">

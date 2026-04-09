@@ -1,4 +1,3 @@
-// Verification lifecycle
 const Verifier = {
   running: false,
 
@@ -12,7 +11,6 @@ const Verifier = {
       return;
     }
 
-    // Clear previous results
     EditorManager.clearAll();
     OutputPanel.clear();
     this.setUIState('verifying');
@@ -24,13 +22,8 @@ const Verifier = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, args }),
       });
-
-      if (!resp.ok) {
-        throw new Error(`Server error: ${resp.status}`);
-      }
-
-      const result = await resp.json();
-      this.handleResult(result);
+      if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
+      this.handleResult(await resp.json());
     } catch (err) {
       this.handleError(err);
     } finally {
@@ -46,30 +39,22 @@ const Verifier = {
     const status = (result.status || 'UNKNOWN').toLowerCase();
     this.setUIState(status);
 
-    // Apply editor decorations
     if (status === 'safe') {
       EditorManager.setDecorations('safe');
     } else if (status === 'unsafe') {
-      const lines = (result.diagnostics || [])
-        .filter(d => d.line)
-        .map(d => d.line);
+      const lines = (result.diagnostics || []).filter(d => d.line).map(d => d.line);
       EditorManager.setDecorations('unsafe', lines);
-      if (result.diagnostics && result.diagnostics.length) {
+      if (result.diagnostics && result.diagnostics.length)
         EditorManager.setMarkers(result.diagnostics);
-      }
     } else if (result.diagnostics && result.diagnostics.length) {
-      // Parse errors, etc.
       EditorManager.setMarkers(result.diagnostics);
     }
 
-    // Populate output panel
     OutputPanel.setStatus(status, result.message, result.elapsedMs);
 
-    // Build primary output: counterexample first (if UNSAFE), then raw output
     let mainOutput = '';
-    if (status === 'unsafe' && result.counterexample) {
+    if (status === 'unsafe' && result.counterexample)
       mainOutput += 'Counterexample:\n' + result.counterexample + '\n\n';
-    }
     if (result.diagnostics && result.diagnostics.length) {
       for (const d of result.diagnostics) {
         const prop = d.property ? ` (${d.property})` : '';
@@ -80,19 +65,13 @@ const Verifier = {
     mainOutput += result.rawOutput || result.message || '';
     OutputPanel.setContent('output', mainOutput);
 
-    // ACSL annotations (only shown when SAFE)
     if (result.acsl) OutputPanel.setContent('acsl', result.acsl);
-    // CHCs (when -p flag used, status is 'info')
     if (result.chcs) OutputPanel.setContent('chcs', result.chcs);
-    // Preprocessor output
     if (result.preprocessorOutput) OutputPanel.setContent('pp', result.preprocessorOutput);
-    // Graphviz images
-    if (result.graphImages && result.graphImages.length) {
+    if (result.graphImages && result.graphImages.length)
       OutputPanel.setGraphImages(result.graphImages);
-    }
     OutputPanel.show();
 
-    // Auto-switch to the most relevant tab
     if (status === 'info') {
       if (result.chcs) OutputPanel.switchTab('chcs');
       else if (result.preprocessorOutput) OutputPanel.switchTab('pp');
@@ -109,11 +88,7 @@ const Verifier = {
   },
 
   setUIState(status) {
-    // Status bar
-    const bar = document.getElementById('status-bar');
-    bar.className = 'status-bar ' + status;
-
-    // Button
+    document.getElementById('status-bar').className = 'status-bar ' + status;
     const btn = document.getElementById('verify-btn');
     if (status === 'verifying') {
       btn.disabled = true;

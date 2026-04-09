@@ -51,10 +51,13 @@ file_put_contents($realTmp, $code);
 
 $wantsGraphs = in_array("'-pDot'", $args) || in_array("'-dotCEX'", $args);
 
-// Build and execute command with:
-//   nice: deprioritize to not impact other server processes
-//   timeout: hard kill as safety net
-//   prlimit: cap heap data to prevent OOM (--data, not --as; JVM needs flexible virtual address space)
+// -printPP without CHC flags: skip verification with -t:0
+$chcFlags = ["'-p'", "'-pDot'", "'-sp'"];
+if (in_array("'-printPP'", $args) && !array_intersect($args, $chcFlags)) {
+    $args[] = escapeshellarg('-t:0');
+}
+
+// Build command with nice + timeout + prlimit for resource control
 $triPpPath = dirname($TRICERA_PATH);
 $cmd = sprintf(
     'cd %s && TRI_PP_PATH=%s nice -n %d timeout --signal=KILL %d prlimit --data=%d %s %s %s 2>&1',
@@ -148,20 +151,25 @@ function parseTriceraOutput($output, $args = []) {
     ];
 
     // When -p or -pDot is used, the output is CHCs (no verification)
-    if (in_array('-p', $args) || in_array('-pDot', $args)) {
+    if (in_array('-p', $args) || in_array('-pDot', $args) || in_array('-sp', $args)) {
         $result['status'] = 'INFO';
         $result['message'] = 'Horn clauses generated (no verification).';
         $result['chcs'] = trim($output);
         return $result;
     }
 
-    // When -printPP is used, preprocessor output precedes the verdict
+    // -printPP: extract preprocessor output before verdict
     if (in_array('-printPP', $args)) {
-        if (preg_match('/^(.*?)(SAFE|UNSAFE|TIMEOUT|UNKNOWN)/ms', $output, $ppMatch)) {
+        if (preg_match('/^(.*?)(?:timeout\n)?(SAFE|UNSAFE|TIMEOUT|UNKNOWN)/ms', $output, $ppMatch)) {
             $result['preprocessorOutput'] = trim($ppMatch[1]);
-            $output = substr($output, strlen($ppMatch[1]));
         } else {
             $result['preprocessorOutput'] = trim($output);
+        }
+        // If -t:0 was used to skip verification, return as INFO
+        if (in_array('-t:0', $args)) {
+            $result['status'] = 'INFO';
+            $result['message'] = 'Preprocessor output generated (verification skipped).';
+            return $result;
         }
     }
 

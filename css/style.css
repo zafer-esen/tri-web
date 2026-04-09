@@ -76,6 +76,28 @@ body {
 }
 .header-btn:hover { background: var(--bg-input); }
 
+/* Help panel */
+.help-panel {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: 250px;
+}
+.help-content p { margin: 4px 0; }
+.help-content ul { margin: 4px 0 4px 20px; }
+.help-content li { margin: 2px 0; }
+.help-content code {
+  background: var(--bg-tertiary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.help-content a { color: var(--accent-blue); }
+
 /* Main layout */
 .main {
   flex: 1;
@@ -245,9 +267,24 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* Section headers */
+.option-section-title {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 0 4px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.option-section-title:first-child {
+  padding-top: 0;
+}
+
 /* Option groups */
 .option-group {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .option-group-label {
   display: flex;
@@ -255,11 +292,18 @@ body {
   gap: 4px;
   font-size: 11px;
   color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   margin-bottom: 5px;
   font-weight: 600;
 }
+.option-sublabel {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-left: 2px;
+}
+.option-sublabel::before { content: '('; }
+.option-sublabel::after { content: ')'; }
 .help-icon {
   display: inline-flex;
   align-items: center;
@@ -312,11 +356,16 @@ body {
   border-color: var(--accent-blue);
 }
 
-/* Option hint */
+/* Option hint and warning */
 .option-hint {
   font-size: 11px;
   color: var(--text-muted);
   font-style: italic;
+  padding: 3px 0 0 20px;
+}
+.option-warning {
+  font-size: 11px;
+  color: var(--warning-yellow);
   padding: 3px 0 0 20px;
 }
 

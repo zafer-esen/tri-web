@@ -1,4 +1,3 @@
-// Monaco language definition for C + TriCera extensions
 const TriceraLanguage = {
   register(monaco) {
     monaco.languages.register({

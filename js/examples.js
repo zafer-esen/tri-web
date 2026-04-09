@@ -1,4 +1,3 @@
-// Example programs and loader
 const ExamplesLoader = {
   categories: [
     {

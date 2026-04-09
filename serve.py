@@ -35,12 +35,17 @@ MAX_LOG_SIZE_MB = 50       # rotate log when it exceeds this size
 
 # Allowed TriCera argument prefixes (security whitelist)
 ALLOWED_ARG_PATTERN = re.compile(
-    r'^-(?:arithMode:[a-z0-9]+|t:\d+|m:\w+|heapModel:[a-z]+|log:\d+'
-    r'|cex|acsl|f|printPP|p|pDot|dotCEX|pngNo'
+    r'^-(?:arithMode:[a-z0-9]+|t:\d+(\.\d+)?|m:\w+|heapModel:[a-z]+|log:\d+'
+    r'|cex|acsl|f|printPP|p|pDot|dotCEX|pngNo|sp'
     r'|reachsafety|memsafety|valid-deref|valid-free'
     r'|valid-memtrack|valid-memcleanup|splitProperties'
     r'|cpp|cppLight|noPP'
-    r'|inv|sol|ssol)$'
+    r'|inv|sol|ssol|statistics'
+    r'|sym|sym:bfs|sym:dfs|symDepth:\d+'
+    r'|abstract:\w+|abstractTO:\d+(\.\d+)?|abstractPO'
+    r'|disj|noSlicing|solutionReconstruction:\w+'
+    r'|splitClauses:\d+'
+    r'|forceNondetInit|mathArrays)$'
 )
 
 
@@ -118,9 +123,8 @@ def parse_tricera_output(output, args=None):
         'preprocessorOutput': None,
     }
 
-    # When -p or -pDot is used, the output is CHCs (no verification)
-    # When -p or -pDot is used: output contains preprocessor text + CHCs
-    if '-p' in args or '-pDot' in args:
+    # -p / -pDot / -sp: CHC output, no verification
+    if '-p' in args or '-pDot' in args or '-sp' in args:
         result['status'] = 'INFO'
         result['message'] = 'Horn clauses generated (no verification).'
         # Split at "System predicates:" - above is preprocessor output, below is CHCs
@@ -134,21 +138,22 @@ def parse_tricera_output(output, args=None):
             result['chcs'] = output.strip()
         return result
 
-    # When -printPP is used alone: show preprocessor output, skip verification
+    # -printPP: extract preprocessor output before verdict
     if '-printPP' in args:
-        # The preprocessor output is everything before SAFE/UNSAFE/etc.
-        parts = re.split(r'^(SAFE|UNSAFE|TIMEOUT|UNKNOWN)', output, maxsplit=1, flags=re.MULTILINE)
+        # Split at timeout/verdict line to isolate preprocessor output
+        parts = re.split(r'^(?:timeout\n)?(SAFE|UNSAFE|TIMEOUT|UNKNOWN)', output, maxsplit=1, flags=re.MULTILINE)
         if len(parts) >= 2:
             result['preprocessorOutput'] = parts[0].strip()
-            # Continue parsing the rest for status
-            output = parts[1] + (parts[2] if len(parts) > 2 else '')
         else:
             result['preprocessorOutput'] = output.strip()
+        # If -t:0 was used to skip verification, treat as INFO
+        if '-t:0' in args:
             result['status'] = 'INFO'
-            result['message'] = 'Preprocessor output generated.'
+            result['message'] = 'Preprocessor output generated (verification skipped).'
+            return result
             return result
 
-    # Check for SAFE (must not match UNSAFE)
+    # Determine verification result
     if re.search(r'^SAFE\s*$', output, re.MULTILINE) and not re.search(r'UNSAFE', output):
         result['status'] = 'SAFE'
         result['message'] = 'Program verified successfully.'
@@ -315,20 +320,24 @@ def run_tricera(code, args):
         with open(tmppath, 'w') as f:
             f.write(code)
 
-        # In server mode: deprioritize with nice, limit heap with prlimit
+        wants_graphs = any(a in safe_args for a in ['-pDot', '-dotCEX'])
+        if wants_graphs and '-pngNo' not in safe_args:
+            safe_args.append('-pngNo')
+
+        # -printPP without CHC flags: skip verification with -t:0
+        chc_flags = ['-p', '-pDot', '-sp']
+        if '-printPP' in safe_args and not any(f in safe_args for f in chc_flags):
+            safe_args.append('-t:0')
+
+        # Build command after all arg modifications
         if SERVER_MODE:
             cmd = [
                 'nice', '-n', '19',
-                'prlimit', f'--data={2048 * 1024 * 1024}',  # 2GB heap data
+                'prlimit', f'--data={2048 * 1024 * 1024}',
                 TRICERA_PATH,
             ] + safe_args + [tmppath]
         else:
             cmd = [TRICERA_PATH] + safe_args + [tmppath]
-
-        wants_graphs = any(a in safe_args for a in ['-pDot', '-dotCEX'])
-        # Suppress TriCera opening image viewer
-        if wants_graphs and '-pngNo' not in safe_args:
-            safe_args.append('-pngNo')
 
         start = time.time()
 
@@ -354,6 +363,7 @@ def run_tricera(code, args):
         elapsed = int((time.time() - start) * 1000)
 
         result = parse_tricera_output(output, safe_args)
+        result['rawOutput'] = output
         result['elapsedMs'] = elapsed
 
         # Collect generated dot files and convert to PNG via graphviz
@@ -470,7 +480,7 @@ class TriceraHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def log_message(self, format, *args):
-        # Only log API calls, suppress static file noise
+        # Only log API calls
         try:
             msg = format % args
         except Exception:

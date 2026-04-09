@@ -14,12 +14,17 @@ $NICE_LEVEL = 19;           // lowest priority
 $MEM_LIMIT_MB = 2048;       // heap data limit for TriCera process (--data, not --as)
 
 // Allowed argument patterns (security whitelist)
-$ALLOWED_ARG_PATTERN = '/^-(?:arithMode:[a-z0-9]+|t:\d+|m:\w+|heapModel:[a-z]+|log:\d+'
-    . '|cex|acsl|f|printPP|p|pDot|dotCEX|pngNo'
+$ALLOWED_ARG_PATTERN = '/^-(?:arithMode:[a-z0-9]+|t:\d+(\.\d+)?|m:\w+|heapModel:[a-z]+|log:\d+'
+    . '|cex|acsl|f|printPP|p|pDot|dotCEX|pngNo|sp'
     . '|reachsafety|memsafety|valid-deref|valid-free'
     . '|valid-memtrack|valid-memcleanup|splitProperties'
     . '|cpp|cppLight|noPP'
-    . '|inv|sol|ssol)$/';
+    . '|inv|sol|ssol|statistics'
+    . '|sym|sym:bfs|sym:dfs|symDepth:\d+'
+    . '|abstract:\w+|abstractTO:\d+(\.\d+)?|abstractPO'
+    . '|disj|noSlicing|solutionReconstruction:\w+'
+    . '|splitClauses:\d+'
+    . '|forceNondetInit|mathArrays)$/';
 
 // Load local overrides if present (gitignored)
 $localConfig = __DIR__ . '/config.local.php';

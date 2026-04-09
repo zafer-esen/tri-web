@@ -1,113 +1,293 @@
-// Data-driven options panel
 const MEMSAFETY_SUBS = ['valid-deref', 'valid-free', 'valid-memtrack', 'valid-memcleanup'];
 
 const OptionsPanel = {
-  groups: [
+  sections: [
     {
-      id: 'arithmetic',
-      label: 'Arithmetic Mode',
-      type: 'select',
-      options: [
-        { value: 'math', label: 'Mathematical (unbounded)', cliArg: '-arithMode:math' },
-        { value: 'ilp32', label: 'ILP32 (32-bit int)', cliArg: '-arithMode:ilp32' },
-        { value: 'lp64', label: 'LP64 (64-bit long)', cliArg: '-arithMode:lp64' },
-        { value: 'llp64', label: 'LLP64 (Windows 64-bit)', cliArg: '-arithMode:llp64' },
+      title: 'Properties to check',
+      groups: [
+        {
+          id: 'properties',
+          type: 'checkboxGroup',
+          options: [
+            { value: 'reachsafety', label: 'Reachability safety', cliArg: '-reachsafety',
+              help: 'Check assert() statements and unreachability of reach_error().' },
+            { value: 'memsafety', label: 'Memory safety (all)', cliArg: '-memsafety',
+              help: 'Check all memory safety properties (selects all sub-options below).' },
+            { value: 'valid-deref', label: 'Valid pointer dereferences', cliArg: '-valid-deref', indent: true,
+              help: 'Check that pointer dereferences and array accesses are within bounds.' },
+            { value: 'valid-free', label: 'Valid free (no double-free)', cliArg: '-valid-free', indent: true,
+              help: 'Check that all free() calls are valid.' },
+            { value: 'valid-memtrack', label: 'Valid memory tracking (no leaks)', cliArg: '-valid-memtrack', indent: true,
+              help: 'Check that all allocated memory is tracked during execution.' },
+            { value: 'valid-memcleanup', label: 'Memory cleanup (freed at exit)', cliArg: '-valid-memcleanup', indent: true,
+              help: 'Check that all allocated memory is freed before program exit.' },
+          ],
+          default: [],
+          help: 'When none selected, reachability safety (assert statements) is checked by default.',
+        },
+        {
+          id: 'splitProperties',
+          label: 'Check properties separately',
+          type: 'toggle',
+          cliArg: '-splitProperties',
+          default: false,
+          help: 'Verify each property independently rather than all at once. Can make individual verification tasks easier.',
+        },
+        {
+          id: 'forceNondetInit',
+          label: 'Non-deterministic initialization',
+          type: 'toggle',
+          cliArg: '-forceNondetInit',
+          default: false,
+          help: 'Initialize static and global variables to non-deterministic values instead of the default zero.',
+        },
       ],
-      default: 'math',
-      help: 'Integer arithmetic semantics. Mathematical uses unbounded integers (default). ILP32/LP64/LLP64 model machine-specific integer sizes with overflow.',
     },
     {
-      id: 'properties',
-      label: 'Properties to Check',
-      type: 'checkboxGroup',
-      options: [
-        { value: 'reachsafety', label: 'Reachability Safety', cliArg: '-reachsafety',
-          help: 'Check assert() statements and unreachability of reach_error().' },
-        { value: 'memsafety', label: 'Memory Safety (all)', cliArg: '-memsafety',
-          help: 'Check all memory safety properties at once (selects all sub-options below).' },
-        { value: 'valid-deref', label: 'Valid Dereferences', cliArg: '-valid-deref', indent: true,
-          help: 'Check pointer dereferences and array accesses are within bounds.' },
-        { value: 'valid-free', label: 'Valid Free', cliArg: '-valid-free', indent: true,
-          help: 'Check no double-free or free of non-heap memory.' },
-        { value: 'valid-memtrack', label: 'Valid Memory Tracking', cliArg: '-valid-memtrack', indent: true,
-          help: 'Check all allocated memory is tracked (no leaks during execution).' },
-        { value: 'valid-memcleanup', label: 'Memory Cleanup', cliArg: '-valid-memcleanup', indent: true,
-          help: 'Check all memory is freed before program exit.' },
+      title: 'Verification engine',
+      groups: [
+        {
+          id: 'backend',
+          label: 'Backend',
+          type: 'select',
+          options: [
+            { value: 'cegar', label: 'CEGAR (default)', cliArg: null },
+            { value: 'sym-bfs', label: 'Symbolic execution (breadth-first)', cliArg: '-sym:bfs' },
+            { value: 'sym-dfs', label: 'Symbolic execution (depth-first)', cliArg: '-sym:dfs' },
+          ],
+          default: 'cegar',
+          help: 'CEGAR uses counterexample-guided abstraction refinement. Symbolic execution explores program paths directly (experimental).',
+        },
+        {
+          id: 'abstract',
+          label: 'Interpolation abstraction',
+          type: 'select',
+          options: [
+            { value: 'portfolio', label: 'Portfolio (default)', cliArg: '-abstractPO' },
+            { value: 'off', label: 'Off', cliArg: '-abstract:off' },
+            { value: 'term', label: 'Term', cliArg: '-abstract:term' },
+            { value: 'oct', label: 'Octagon', cliArg: '-abstract:oct' },
+            { value: 'relEqs', label: 'Relational equalities', cliArg: '-abstract:relEqs' },
+            { value: 'relIneqs', label: 'Relational inequalities', cliArg: '-abstract:relIneqs' },
+            { value: 'relEqs2', label: 'Relational equalities v2', cliArg: '-abstract:relEqs2' },
+            { value: 'relIneqs2', label: 'Relational inequalities v2', cliArg: '-abstract:relIneqs2' },
+          ],
+          default: 'portfolio',
+          help: 'Controls how interpolants are abstracted during CEGAR. Portfolio runs with and without abstraction in parallel.',
+          visible: () => OptionsPanel.state.backend === 'cegar',
+        },
+        {
+          id: 'abstractTO',
+          label: 'Abstraction timeout (seconds)',
+          type: 'number',
+          cliArgPrefix: '-abstractTO:',
+          default: 2,
+          min: 1,
+          max: 30,
+          help: 'Timeout for the abstraction template search.',
+          visible: () => OptionsPanel.state.backend === 'cegar'
+            && !['portfolio', 'off'].includes(OptionsPanel.state.abstract),
+        },
+        {
+          id: 'disj',
+          label: 'Disjunctive interpolation',
+          type: 'toggle',
+          cliArg: '-disj',
+          default: false,
+          help: 'Use disjunctive interpolation for more precise invariants (may be slower).',
+          visible: () => OptionsPanel.state.backend === 'cegar',
+        },
+        {
+          id: 'solReconstruction',
+          label: 'Solution reconstruction',
+          type: 'select',
+          options: [
+            { value: 'wp', label: 'Weakest preconditions (default)', cliArg: null },
+            { value: 'cegar', label: 'CEGAR-based', cliArg: '-solutionReconstruction:cegar' },
+          ],
+          default: 'wp',
+          help: 'Method for reconstructing solutions from proofs. CEGAR-based may produce different invariants.',
+        },
+        {
+          id: 'symDepth',
+          label: 'Max depth',
+          type: 'number',
+          cliArgPrefix: '-symDepth:',
+          default: '',
+          min: 1,
+          max: 1000,
+          help: 'Maximum depth for symbolic execution (underapproximation). Leave empty for unlimited.',
+          visible: () => OptionsPanel.state.backend === 'sym-bfs',
+        },
+        {
+          id: 'slicing',
+          label: 'Clause slicing',
+          type: 'select',
+          options: [
+            { value: 'yes', label: 'Yes (default)', cliArg: null },
+            { value: 'no', label: 'No', cliArg: '-noSlicing' },
+          ],
+          default: 'yes',
+          help: 'Clause slicing removes irrelevant parts of clauses to speed up solving.',
+        },
+        {
+          id: 'splitClauses',
+          label: 'Split disjunctions in clauses',
+          type: 'select',
+          options: [
+            { value: '0', label: "Don't split (0)", cliArg: '-splitClauses:0' },
+            { value: '1', label: 'Default (1)', cliArg: null },
+            { value: '2', label: 'Aggressive (2)', cliArg: '-splitClauses:2' },
+          ],
+          default: '1',
+          help: 'How aggressively to split disjunctions in Horn clauses. Higher values may help with some programs but increase clause count.',
+        },
       ],
-      default: [],
-      help: 'When none selected, reachability safety (assert statements) is checked by default.',
     },
     {
-      id: 'splitProperties',
-      label: 'Split Properties',
-      type: 'toggle',
-      cliArg: '-splitProperties',
-      default: false,
-      help: 'Verify each property separately rather than all at once. Useful for pinpointing which property fails.',
-    },
-    {
-      id: 'timeout',
-      label: 'Timeout (seconds)',
-      type: 'number',
-      cliArgPrefix: '-t:',
-      default: 30,
-      min: 1,
-      max: 60,
-      help: 'Maximum verification time (up to 60 seconds).',
-    },
-    {
-      id: 'entryFunction',
-      label: 'Entry Function',
-      type: 'text',
-      cliArgPrefix: '-m:',
-      default: 'main',
-      help: 'The function to use as the program entry point.',
-    },
-    {
-      id: 'heapModel',
-      label: 'Heap Model',
-      type: 'select',
-      options: [
-        { value: 'native', label: 'Native (theory of heaps)', cliArg: '-heapModel:native' },
-        { value: 'array', label: 'Array (experimental)', cliArg: '-heapModel:array' },
+      title: 'Output',
+      groups: [
+        {
+          id: 'outputCex',
+          label: 'Counterexamples',
+          sublabel: 'when UNSAFE',
+          type: 'checkboxGroup',
+          options: [
+            { value: 'cex', label: 'Textual', cliArg: '-cex',
+              help: 'Display a step-by-step textual counterexample trace.' },
+            { value: 'dotCEX', label: 'Graphical diagram', cliArg: '-dotCEX',
+              help: 'Generate a graphical counterexample diagram.' },
+          ],
+          default: ['cex'],
+        },
+        {
+          id: 'outputSol',
+          label: 'Solutions',
+          sublabel: 'when SAFE',
+          type: 'checkboxGroup',
+          options: [
+            { value: 'sol', label: 'Prolog format', cliArg: '-sol',
+              help: 'Display invariants and solutions in Prolog format.' },
+            { value: 'ssol', label: 'SMT-LIB format', cliArg: '-ssol',
+              help: 'Display invariants and solutions in SMT-LIB format.' },
+          ],
+          default: [],
+        },
+        {
+          id: 'outputAnnot',
+          label: 'Inferred annotations',
+          sublabel: 'when SAFE',
+          type: 'checkboxGroup',
+          options: [
+            { value: 'inv', label: 'Loop invariants', cliArg: '-inv',
+              help: 'Try to infer loop invariants. Automatically enables ACSL output.' },
+            { value: 'acsl', label: 'ACSL pre/postconditions', cliArg: '-acsl',
+              help: 'Generate ACSL-style function contracts and loop invariants.' },
+          ],
+          default: [],
+        },
+        {
+          id: 'outputCHC',
+          label: 'Horn encoding of the program',
+          sublabel: 'skips verification',
+          type: 'checkboxGroup',
+          options: [
+            { value: 'printCHCs', label: 'Prolog format', cliArg: '-p',
+              help: 'Display the Horn clause encoding in Prolog format.' },
+            { value: 'spCHCs', label: 'SMT-LIB format', cliArg: '-sp',
+              help: 'Display the Horn clause encoding in SMT-LIB format.' },
+            { value: 'pDot', label: 'Graphical diagram', cliArg: '-pDot',
+              help: 'Generate graphical Horn clause diagrams. Shows clauses before and after simplification.' },
+          ],
+          default: [],
+        },
+        {
+          id: 'printPP',
+          type: 'toggle',
+          cliArg: '-printPP',
+          default: false,
+          label: 'TriCera preprocessor output',
+          help: 'Show the output of the TriCera preprocessor (tri-pp). Skips verification.',
+        },
+        {
+          id: 'statistics',
+          type: 'toggle',
+          cliArg: '-statistics',
+          default: false,
+          label: 'Verification statistics',
+          help: 'Display solving statistics: time, CEGAR iterations, clause counts, etc.',
+        },
       ],
-      default: 'native',
-      help: 'Memory model for heap operations. Native uses a theory of heaps; array is experimental.',
     },
     {
-      id: 'output',
-      label: 'Output Options',
-      type: 'checkboxGroup',
-      options: [
-        { value: 'cex', label: 'Show Counterexamples', cliArg: '-cex',
-          help: 'Display a textual counterexample trace when the result is UNSAFE.' },
-        { value: 'dotCEX', label: 'Graphical Counterexample', cliArg: '-dotCEX',
-          help: 'Generate a graphical counterexample diagram (requires Graphviz). Shown when UNSAFE.' },
-        { value: 'inv', label: 'Infer Loop Invariants', cliArg: '-inv',
-          help: 'Try to infer loop invariants. Automatically enables ACSL output. Only works when the program is SAFE.' },
-        { value: 'acsl', label: 'Infer ACSL Annotations', cliArg: '-acsl',
-          help: 'Generate ACSL-style pre/postconditions and loop invariants. Only available when the program is SAFE.' },
-        { value: 'printCHCs', label: 'Print Horn Clauses', cliArg: '-p',
-          help: 'Display the generated Constrained Horn Clauses (skips verification).' },
-        { value: 'pDot', label: 'Graphical Horn Clauses', cliArg: '-pDot',
-          help: 'Generate graphical representation of Horn clauses (requires Graphviz). Generates two graphs: before and after simplification.' },
-        { value: 'printPP', label: 'TriCera Preprocessor', cliArg: '-printPP',
-          help: 'Show the output of the TriCera preprocessor (tri-pp). Skips verification.' },
+      title: 'Settings',
+      groups: [
+        {
+          id: 'arithmetic',
+          label: 'Integer arithmetic',
+          type: 'select',
+          options: [
+            { value: 'math', label: 'Mathematical (unbounded)', cliArg: '-arithMode:math' },
+            { value: 'ilp32', label: 'ILP32 (32-bit int)', cliArg: '-arithMode:ilp32' },
+            { value: 'lp64', label: 'LP64 (64-bit long)', cliArg: '-arithMode:lp64' },
+            { value: 'llp64', label: 'LLP64 (Windows 64-bit)', cliArg: '-arithMode:llp64' },
+          ],
+          default: 'math',
+          help: 'Integer semantics. Mathematical uses unbounded integers (default). ILP32/LP64/LLP64 model machine-specific integer sizes with overflow.',
+        },
+        {
+          id: 'heapModel',
+          label: 'Heap model',
+          type: 'select',
+          options: [
+            { value: 'native', label: 'Native (theory of heaps)', cliArg: '-heapModel:native' },
+            { value: 'array', label: 'Array (experimental)', cliArg: '-heapModel:array' },
+          ],
+          default: 'native',
+          help: 'Memory model for heap operations. Native uses a theory of heaps; array-based is experimental.',
+        },
+        {
+          id: 'programArrays',
+          label: 'Program arrays',
+          type: 'select',
+          options: [
+            { value: 'heap', label: 'Theory of heaps (default)', cliArg: null },
+            { value: 'math', label: 'Mathematical', cliArg: '-mathArrays' },
+          ],
+          default: 'heap',
+          help: 'How to model C arrays. Theory of heaps allocates arrays on the heap. Mathematical arrays are unbounded and skip memory safety checks on arrays.',
+        },
+        {
+          id: 'preprocessor',
+          label: 'C preprocessor',
+          type: 'select',
+          options: [
+            { value: 'default', label: 'None', cliArg: null },
+            { value: 'cpp', label: 'Full (cpp)', cliArg: '-cpp' },
+            { value: 'cppLight', label: 'Light (no system headers)', cliArg: '-cppLight' },
+          ],
+          default: 'default',
+          help: 'Run the C preprocessor (cpp) on the input before TriCera\'s own preprocessor (tri-pp). Light mode skips system headers.',
+        },
+        {
+          id: 'entryFunction',
+          label: 'Entry function',
+          type: 'text',
+          cliArgPrefix: '-m:',
+          default: 'main',
+          help: 'The function to use as the program entry point.',
+        },
+        {
+          id: 'timeout',
+          label: 'Timeout (seconds)',
+          type: 'number',
+          cliArgPrefix: '-t:',
+          default: 30,
+          min: 1,
+          max: 60,
+          help: 'Maximum verification time (up to 60 seconds).',
+        },
       ],
-      default: ['cex'],
-      help: 'Additional output to include with verification results.',
-    },
-    {
-      id: 'preprocessor',
-      label: 'C Preprocessor',
-      type: 'select',
-      options: [
-        { value: 'default', label: 'None / Disabled', cliArg: null },
-        { value: 'cpp', label: 'Full (cpp)', cliArg: '-cpp' },
-        { value: 'cppLight', label: 'Light (no system headers)', cliArg: '-cppLight' },
-      ],
-      default: 'default',
-      help: 'Run the C preprocessor (cpp) on the input before TriCera\'s own preprocessor (tri-pp). "Light" skips system headers.',
     },
   ],
 
@@ -122,30 +302,44 @@ const OptionsPanel = {
 
   resetState() {
     this.state = {};
-    for (const g of this.groups) {
-      this.state[g.id] = JSON.parse(JSON.stringify(g.default));
+    for (const sec of this.sections) {
+      for (const g of sec.groups) {
+        this.state[g.id] = JSON.parse(JSON.stringify(g.default));
+      }
     }
   },
 
   render() {
     this.container.innerHTML = '';
-    for (const group of this.groups) {
-      const el = document.createElement('div');
-      el.className = 'option-group';
-      el.dataset.groupId = group.id;
-      el.innerHTML = this._renderLabel(group);
-      el.innerHTML += this._renderControl(group);
-      this.container.appendChild(el);
-      this._bindEvents(el, group);
+    for (const sec of this.sections) {
+      const header = document.createElement('div');
+      header.className = 'option-section-title';
+      header.textContent = sec.title;
+      this.container.appendChild(header);
+
+      for (const group of sec.groups) {
+        const el = document.createElement('div');
+        el.className = 'option-group';
+        el.dataset.groupId = group.id;
+        if (group.visible && !group.visible()) {
+          el.style.display = 'none';
+        }
+        if (group.label && group.type !== 'toggle') {
+          el.innerHTML = this._renderLabel(group);
+        }
+        el.innerHTML += this._renderControl(group);
+        this.container.appendChild(el);
+        this._bindEvents(el, group);
+      }
     }
   },
 
   _renderLabel(group) {
-    return `
-      <div class="option-group-label">
-        ${group.label}
-        <span class="help-icon">?<span class="tooltip">${group.help}</span></span>
-      </div>`;
+    const sublabel = group.sublabel
+      ? `<span class="option-sublabel">${group.sublabel}</span>` : '';
+    const help = group.help
+      ? `<span class="help-icon">?<span class="tooltip">${group.help}</span></span>` : '';
+    return `<div class="option-group-label">${group.label}${sublabel}${help}</div>`;
   },
 
   _renderControl(group) {
@@ -170,8 +364,7 @@ const OptionsPanel = {
     const items = group.options.map(o => {
       const checked = (this.state[group.id] || []).includes(o.value) ? 'checked' : '';
       const helpHtml = o.help
-        ? `<span class="help-icon">?<span class="tooltip">${o.help}</span></span>`
-        : '';
+        ? `<span class="help-icon">?<span class="tooltip">${o.help}</span></span>` : '';
       const indent = o.indent ? ' checkbox-indent' : '';
       return `
         <div class="checkbox-item${indent}">
@@ -180,16 +373,20 @@ const OptionsPanel = {
           ${helpHtml}
         </div>`;
     }).join('');
-    // Show default hint when nothing is selected (for properties group)
-    const noneSelected = !(this.state[group.id] || []).length;
-    const hint = (group.id === 'properties')
-      ? `<div class="option-hint" id="properties-hint" style="display:${noneSelected ? 'block' : 'none'}">Default: checking reachability safety (assert statements)</div>`
-      : '';
-    return items + hint;
+    if (group.id !== 'properties') return items;
+    const arr = this.state[group.id] || [];
+    const noneSelected = !arr.length;
+    const hasMemButNoReach = arr.some(v => MEMSAFETY_SUBS.includes(v) || v === 'memsafety')
+      && !arr.includes('reachsafety');
+    const hint = `<div class="option-hint" style="display:${noneSelected ? 'block' : 'none'}">Default: checking reachability safety (assert statements)</div>`;
+    const warn = `<div class="option-warning" style="display:${hasMemButNoReach ? 'block' : 'none'}">Note: assert statements in the program are not being checked. Select reachability safety to check them.</div>`;
+    return items + hint + warn;
   },
 
   _renderToggle(group) {
     const checked = this.state[group.id] ? 'checked' : '';
+    const help = group.help
+      ? `<span class="help-icon">?<span class="tooltip">${group.help}</span></span>` : '';
     return `
       <div class="toggle-item">
         <label class="toggle-switch">
@@ -197,11 +394,13 @@ const OptionsPanel = {
           <span class="toggle-slider"></span>
         </label>
         <span>${group.label}</span>
+        ${help}
       </div>`;
   },
 
   _renderNumber(group) {
-    return `<input type="number" data-id="${group.id}" value="${this.state[group.id]}" min="${group.min || ''}" max="${group.max || ''}">`;
+    const val = this.state[group.id];
+    return `<input type="number" data-id="${group.id}" value="${val === '' ? '' : val}" min="${group.min || ''}" max="${group.max || ''}" placeholder="${group.default === '' ? 'unlimited' : ''}">`;
   },
 
   _renderText(group) {
@@ -213,6 +412,7 @@ const OptionsPanel = {
       case 'select':
         el.querySelector('select').addEventListener('change', e => {
           this.state[group.id] = e.target.value;
+          this._onGroupChange(group.id);
         });
         break;
       case 'checkboxGroup':
@@ -227,7 +427,7 @@ const OptionsPanel = {
               if (idx >= 0) arr.splice(idx, 1);
             }
             this.state[group.id] = arr;
-            this._applyCouplings(group.id, val, e.target.checked);
+            this._onCheckboxChange(group.id, val, e.target.checked);
           });
         });
         break;
@@ -239,10 +439,16 @@ const OptionsPanel = {
       case 'number': {
         const inp = el.querySelector('input');
         const clamp = () => {
+          if (inp.value === '' && group.default === '') {
+            this.state[group.id] = '';
+            return;
+          }
           let v = parseInt(inp.value, 10);
-          if (isNaN(v)) v = group.default;
-          if (group.min != null) v = Math.max(v, group.min);
-          if (group.max != null) v = Math.min(v, group.max);
+          if (isNaN(v)) v = group.default === '' ? '' : group.default;
+          else {
+            if (group.min != null) v = Math.max(v, group.min);
+            if (group.max != null) v = Math.min(v, group.max);
+          }
           inp.value = v;
           this.state[group.id] = v;
         };
@@ -258,19 +464,22 @@ const OptionsPanel = {
     }
   },
 
-  // Handle option dependencies/couplings
-  _applyCouplings(groupId, value, checked) {
-    if (groupId === 'properties') {
-      this._applyPropertyCouplings(value, checked);
-    } else if (groupId === 'output') {
-      this._applyOutputCouplings(value, checked);
+  _onGroupChange(groupId) {
+    if (groupId === 'backend' || groupId === 'abstract') {
+      this._fullRerender();
     }
+  },
+
+  _onCheckboxChange(groupId, value, checked) {
+    if (groupId === 'properties') this._applyPropertyCouplings(value, checked);
+    else if (groupId === 'outputAnnot') this._applyAnnotationCouplings(value, checked);
+    else if (groupId === 'outputCHC') this._applyCHCCouplings(value, checked);
+    else if (groupId === 'outputCex') this._applyCexCouplings(value, checked);
   },
 
   _applyPropertyCouplings(value, checked) {
     const arr = this.state.properties;
     if (value === 'memsafety') {
-      // memsafety toggles all sub-options
       for (const sub of MEMSAFETY_SUBS) {
         const idx = arr.indexOf(sub);
         if (checked && idx < 0) arr.push(sub);
@@ -278,109 +487,113 @@ const OptionsPanel = {
       }
     } else if (MEMSAFETY_SUBS.includes(value)) {
       if (!checked) {
-        // Deselecting a sub-option deselects memsafety
         const msIdx = arr.indexOf('memsafety');
         if (msIdx >= 0) arr.splice(msIdx, 1);
-      } else {
-        // If all subs are now selected, auto-select memsafety
-        if (MEMSAFETY_SUBS.every(s => arr.includes(s))) {
-          if (!arr.includes('memsafety')) arr.push('memsafety');
-        }
+      } else if (MEMSAFETY_SUBS.every(s => arr.includes(s))) {
+        if (!arr.includes('memsafety')) arr.push('memsafety');
       }
     }
-    // Re-render to update checkboxes and hint
     this._rerenderGroup('properties');
   },
 
-  _applyOutputCouplings(value, checked) {
-    const arr = this.state.output;
-    if (checked) {
-      // inv auto-enables acsl
-      if (value === 'inv' && !arr.includes('acsl')) {
-        arr.push('acsl');
-      }
-      // pDot auto-enables printCHCs
-      if (value === 'pDot' && !arr.includes('printCHCs')) {
-        arr.push('printCHCs');
-      }
-    } else {
-      // Deselecting acsl also deselects inv
-      if (value === 'acsl') {
-        const invIdx = arr.indexOf('inv');
-        if (invIdx >= 0) arr.splice(invIdx, 1);
-      }
-      // Deselecting printCHCs also deselects pDot
-      if (value === 'printCHCs') {
-        const pdIdx = arr.indexOf('pDot');
-        if (pdIdx >= 0) arr.splice(pdIdx, 1);
-      }
+  _applyAnnotationCouplings(value, checked) {
+    const arr = this.state.outputAnnot;
+    if (checked && value === 'inv' && !arr.includes('acsl')) arr.push('acsl');
+    if (!checked && value === 'acsl') {
+      const idx = arr.indexOf('inv');
+      if (idx >= 0) arr.splice(idx, 1);
     }
-    // Re-render to update checkboxes
-    this._rerenderGroup('output');
+    this._rerenderGroup('outputAnnot');
+  },
+
+  _applyCHCCouplings(value, checked) {
+    const arr = this.state.outputCHC;
+    if (checked && value === 'pDot' && !arr.includes('printCHCs')) arr.push('printCHCs');
+    if (!checked && value === 'printCHCs') {
+      const idx = arr.indexOf('pDot');
+      if (idx >= 0) arr.splice(idx, 1);
+    }
+    this._rerenderGroup('outputCHC');
+  },
+
+  _applyCexCouplings(value, checked) {
+    const arr = this.state.outputCex;
+    if (checked && value === 'dotCEX' && !arr.includes('cex')) arr.push('cex');
+    this._rerenderGroup('outputCex');
   },
 
   _rerenderGroup(groupId) {
-    const group = this.groups.find(g => g.id === groupId);
+    const group = this._findGroup(groupId);
     const el = this.container.querySelector(`[data-group-id="${groupId}"]`);
     if (!group || !el) return;
-    el.innerHTML = this._renderLabel(group) + this._renderControl(group);
+    const labelHtml = (group.label && group.type !== 'toggle') ? this._renderLabel(group) : '';
+    el.innerHTML = labelHtml + this._renderControl(group);
     this._bindEvents(el, group);
     this._initTooltips();
   },
 
+  _fullRerender() {
+    this.render();
+    this._initTooltips();
+  },
+
+  _findGroup(id) {
+    for (const sec of this.sections) {
+      for (const g of sec.groups) {
+        if (g.id === id) return g;
+      }
+    }
+    return null;
+  },
+
   getCliArgs() {
     const args = [];
-    for (const group of this.groups) {
-      const val = this.state[group.id];
-      switch (group.type) {
-        case 'select': {
-          const opt = group.options.find(o => o.value === val);
-          if (opt && opt.cliArg) args.push(opt.cliArg);
-          break;
+    for (const sec of this.sections) {
+      for (const group of sec.groups) {
+        if (group.visible && !group.visible()) continue;
+        const val = this.state[group.id];
+        switch (group.type) {
+          case 'select': {
+            const opt = group.options.find(o => o.value === val);
+            if (opt && opt.cliArg) args.push(opt.cliArg);
+            break;
+          }
+          case 'checkboxGroup':
+            for (const v of (val || [])) {
+              const opt = group.options.find(o => o.value === v);
+              if (opt) args.push(opt.cliArg);
+            }
+            break;
+          case 'toggle':
+            if (val && group.cliArg) args.push(group.cliArg);
+            break;
+          case 'number':
+            if (val !== '' && val != null && group.cliArgPrefix)
+              args.push(group.cliArgPrefix + val);
+            break;
+          case 'text':
+            if (val && val !== group.default && group.cliArgPrefix)
+              args.push(group.cliArgPrefix + val);
+            break;
         }
-        case 'checkboxGroup':
-          for (const v of (val || [])) {
-            const opt = group.options.find(o => o.value === v);
-            if (opt) args.push(opt.cliArg);
-          }
-          break;
-        case 'toggle':
-          if (val && group.cliArg) args.push(group.cliArg);
-          break;
-        case 'number':
-          if (val != null && group.cliArgPrefix) {
-            args.push(group.cliArgPrefix + val);
-          }
-          break;
-        case 'text':
-          if (val && val !== group.default && group.cliArgPrefix) {
-            args.push(group.cliArgPrefix + val);
-          }
-          break;
       }
     }
     return args;
   },
 
-  getState() {
-    return JSON.parse(JSON.stringify(this.state));
-  },
+  getState() { return JSON.parse(JSON.stringify(this.state)); },
 
   setState(obj) {
     for (const key in obj) {
-      if (this.state.hasOwnProperty(key)) {
-        this.state[key] = obj[key];
-      }
+      if (this.state.hasOwnProperty(key)) this.state[key] = obj[key];
     }
-    this.render();
-    this._initTooltips();
+    this._fullRerender();
   },
 
   _initTooltips() {
     this.container.querySelectorAll('.help-icon').forEach(icon => {
       const tooltip = icon.querySelector('.tooltip');
       if (!tooltip) return;
-      // Remove old listeners by cloning
       const newIcon = icon.cloneNode(true);
       icon.parentNode.replaceChild(newIcon, icon);
       const newTooltip = newIcon.querySelector('.tooltip');

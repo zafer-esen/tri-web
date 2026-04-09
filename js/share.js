@@ -1,32 +1,10 @@
-// Sharing / permalink functionality
 const ShareManager = {
-  init() {
-    // Nothing to init - called from app.js
-  },
-
   async share() {
     const state = {
       code: EditorManager.getCode(),
       options: OptionsPanel.getState(),
     };
 
-    // Try client-side encoding first (for small programs)
-    try {
-      const json = JSON.stringify(state);
-      const encoded = btoa(unescape(encodeURIComponent(json)));
-
-      // If small enough for URL hash, use that
-      if (encoded.length < 4000) {
-        const url = window.location.origin + window.location.pathname + '#code=' + encoded;
-        await this.copyToClipboard(url);
-        this.showToast('Share link copied to clipboard');
-        return;
-      }
-    } catch (e) {
-      // Fall through to server-side sharing
-    }
-
-    // Server-side sharing for larger programs
     try {
       const resp = await fetch('api/share', {
         method: 'POST',
@@ -45,22 +23,6 @@ const ShareManager = {
   },
 
   async restoreFromURL() {
-    // Check hash-based sharing
-    const hash = window.location.hash;
-    if (hash.startsWith('#code=')) {
-      try {
-        const encoded = hash.slice(6);
-        const json = decodeURIComponent(escape(atob(encoded)));
-        const state = JSON.parse(json);
-        if (state.code) EditorManager.setCode(state.code);
-        if (state.options) OptionsPanel.setState(state.options);
-        return true;
-      } catch (e) {
-        console.error('Failed to restore from hash:', e);
-      }
-    }
-
-    // Check query-param sharing
     const params = new URLSearchParams(window.location.search);
     const shareId = params.get('share');
     if (shareId) {
@@ -75,7 +37,6 @@ const ShareManager = {
         console.error('Failed to load shared program:', e);
       }
     }
-
     return false;
   },
 
@@ -83,7 +44,6 @@ const ShareManager = {
     try {
       await navigator.clipboard.writeText(text);
     } catch {
-      // Fallback for non-HTTPS contexts
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
