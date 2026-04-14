@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 /*$
 SimpleInvariant(int x) {
   x == 3

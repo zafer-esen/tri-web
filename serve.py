@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""
-Local development server for TriCera web interface.
-No external dependencies - uses Python standard library only.
-
-Usage:
-    python3 serve.py
-    python3 serve.py --port 3000 --tricera /path/to/tri
-"""
+"""TriCera web interface server. Uses only the Python standard library."""
 
 import argparse
 import base64
@@ -15,25 +8,28 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import uuid
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-# Configuration
 TRICERA_PATH = None
 SHARE_DIR = None
 LOG_DIR = None
 MAX_CODE_SIZE = 50000
-MAX_TIMEOUT = 60           # max user-requested timeout
-HARD_TIMEOUT = 65          # hard kill (slightly above MAX_TIMEOUT)
-SERVER_MODE = False        # when True, use nice + resource limits
-MAX_LOG_SIZE_MB = 50       # rotate log when it exceeds this size
+MAX_TIMEOUT = 60
+HARD_TIMEOUT = 65
+SERVER_MODE = False
+MAX_LOG_SIZE_MB = 50
 
-# Allowed TriCera argument prefixes (security whitelist)
+RUNNING_PROCS = {}
+RUNNING_PROCS_LOCK = threading.Lock()
+
 ALLOWED_ARG_PATTERN = re.compile(
     r'^-(?:arithMode:[a-z0-9]+|t:\d+(\.\d+)?|m:\w+|heapModel:[a-z]+|log:\d+'
     r'|cex|acsl|f|printPP|p|pDot|dotCEX|pngNo|sp'
@@ -50,12 +46,11 @@ ALLOWED_ARG_PATTERN = re.compile(
 
 
 def log_submission(remote_addr, code, args, result_status, elapsed_ms):
-    """Append a verification submission to the log file with rotation."""
+    """Append a verification submission to the log, rotating at MAX_LOG_SIZE_MB."""
     if not LOG_DIR:
         return
     try:
         log_path = os.path.join(LOG_DIR, 'submissions.log')
-        # Rotate if too large
         if os.path.isfile(log_path) and os.path.getsize(log_path) > MAX_LOG_SIZE_MB * 1024 * 1024:
             rotated = log_path + '.1'
             if os.path.isfile(rotated):
@@ -63,14 +58,13 @@ def log_submission(remote_addr, code, args, result_status, elapsed_ms):
             os.rename(log_path, rotated)
         with open(log_path, 'a') as f:
             ts = time.strftime('%Y-%m-%d %H:%M:%S')
-            # Truncate code in log to first 500 chars
             code_preview = code[:500].replace('\n', '\\n')
             if len(code) > 500:
                 code_preview += f'... ({len(code)} chars total)'
             f.write(f'{ts} | {remote_addr} | {result_status} | {elapsed_ms}ms | args: {args}\n')
             f.write(f'  code: {code_preview}\n')
     except Exception:
-        pass  # logging should never break verification
+        pass
 
 
 TRICERA_VERSION = None
@@ -94,7 +88,7 @@ def detect_tricera_version():
 
 
 def find_tricera():
-    """Auto-detect the TriCera executable."""
+    """Locate the tri executable via TRICERA_PATH, sibling dirs, or PATH."""
     candidates = [
         os.environ.get('TRICERA_PATH', ''),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tricera', 'tri'),
@@ -103,11 +97,7 @@ def find_tricera():
     for path in candidates:
         if path and os.path.isfile(path) and os.access(path, os.X_OK):
             return os.path.abspath(path)
-    # Check PATH
-    which = shutil.which('tri')
-    if which:
-        return which
-    return None
+    return shutil.which('tri')
 
 
 def parse_tricera_output(output, args=None):
@@ -123,11 +113,9 @@ def parse_tricera_output(output, args=None):
         'preprocessorOutput': None,
     }
 
-    # -p / -pDot / -sp: CHC output, no verification
     if '-p' in args or '-pDot' in args or '-sp' in args:
         result['status'] = 'INFO'
         result['message'] = 'Horn clauses generated (no verification).'
-        # Split at "System predicates:" - above is preprocessor output, below is CHCs
         parts = re.split(r'^(System predicates:)', output, maxsplit=1, flags=re.MULTILINE)
         if len(parts) >= 3:
             pp_text = parts[0].strip()
@@ -138,22 +126,17 @@ def parse_tricera_output(output, args=None):
             result['chcs'] = output.strip()
         return result
 
-    # -printPP: extract preprocessor output before verdict
     if '-printPP' in args:
-        # Split at timeout/verdict line to isolate preprocessor output
         parts = re.split(r'^(?:timeout\n)?(SAFE|UNSAFE|TIMEOUT|UNKNOWN)', output, maxsplit=1, flags=re.MULTILINE)
         if len(parts) >= 2:
             result['preprocessorOutput'] = parts[0].strip()
         else:
             result['preprocessorOutput'] = output.strip()
-        # If -t:0 was used to skip verification, treat as INFO
         if '-t:0' in args:
             result['status'] = 'INFO'
             result['message'] = 'Preprocessor output generated (verification skipped).'
             return result
-            return result
 
-    # Determine verification result
     if re.search(r'^SAFE\s*$', output, re.MULTILINE) and not re.search(r'UNSAFE', output):
         result['status'] = 'SAFE'
         result['message'] = 'Program verified successfully.'
@@ -171,7 +154,6 @@ def parse_tricera_output(output, args=None):
         reason = m.group(1) or ''
         result['message'] = f'Result unknown: {reason}' if reason else 'Result unknown.'
 
-    # Parse errors
     for m in re.finditer(r'Parse Error: At line (\d+)', output):
         result['status'] = 'ERROR'
         line = int(m.group(1))
@@ -184,19 +166,16 @@ def parse_tricera_output(output, args=None):
             'property': None,
         })
 
-    # Translation errors
     m = re.search(r'Horn Translation Error:\s*(.+)', output)
     if m:
         result['status'] = 'ERROR'
         result['message'] = f'Translation error: {m.group(1)}'
 
-    # Other errors
     m = re.search(r'Other Error:\s*(.+)', output)
     if m:
         result['status'] = 'ERROR'
         result['message'] = f'Error: {m.group(1)}'
 
-    # Out of memory / stack overflow
     if 'Out of Memory' in output:
         result['status'] = 'ERROR'
         result['message'] = 'Out of memory.'
@@ -204,7 +183,6 @@ def parse_tricera_output(output, args=None):
         result['status'] = 'ERROR'
         result['message'] = 'Stack overflow.'
 
-    # Failed assertions with line/col info
     for m in re.finditer(
         r'Failed assertion:\s*\n(.+?)\(line:(\d+)\s+col:(\d+)\)\s*(?:\(property:\s*(.+?)\))?',
         output, re.DOTALL
@@ -217,12 +195,10 @@ def parse_tricera_output(output, args=None):
             'property': (m.group(4) or 'user-assertion').strip(),
         })
 
-    # Extract counterexample (text between --- delimiters before UNSAFE)
     cex_match = re.search(r'(-{3,}\nInit:.*?)(?=Failed assertion:|UNSAFE)', output, re.DOTALL)
     if cex_match:
         result['counterexample'] = cex_match.group(1).strip()
 
-    # Extract ACSL annotations (between ===... delimiters)
     acsl_match = re.search(
         r'Inferred ACSL annotations\n={10,}\n(.*?)={10,}',
         output, re.DOTALL
@@ -234,11 +210,10 @@ def parse_tricera_output(output, args=None):
 
 
 def collect_graph_images(workdir):
-    """Find generated PNG and dot files in workdir, return as base64 images."""
+    """Collect -pDot PNGs and -dotCEX dot files, returning base64-encoded PNGs."""
     images = []
     dot_bin = shutil.which('dot')
 
-    # 1. Collect pre-generated PNG files from -pDot (graph0.png, graph1.png, ...)
     pngs = sorted(globmod.glob(os.path.join(workdir, 'graph*.png')))
     labels = ['Horn Clauses (before simplification)', 'Horn Clauses (after simplification)']
     for i, pngf in enumerate(pngs):
@@ -253,7 +228,6 @@ def collect_graph_images(workdir):
         except Exception:
             continue
 
-    # 2. Convert dot files that don't have a corresponding PNG (e.g., dag-graph-cex.dot)
     if dot_bin:
         cex_dot = os.path.join(workdir, 'dag-graph-cex.dot')
         if os.path.isfile(cex_dot):
@@ -274,11 +248,10 @@ def collect_graph_images(workdir):
 
 
 def validate_args(args):
-    """Validate and filter CLI arguments against whitelist."""
+    """Validate and filter CLI arguments against the whitelist, clamping -t:N."""
     safe_args = []
     for arg in args:
         if ALLOWED_ARG_PATTERN.match(arg):
-            # Clamp -t:N to MAX_TIMEOUT
             m = re.match(r'^-t:(\d+)$', arg)
             if m:
                 t = min(int(m.group(1)), MAX_TIMEOUT)
@@ -288,7 +261,7 @@ def validate_args(args):
     return safe_args
 
 
-def run_tricera(code, args):
+def run_tricera(code, args, request_id=None):
     """Run TriCera on the given code and return structured result."""
     if not TRICERA_PATH:
         return {
@@ -310,10 +283,8 @@ def run_tricera(code, args):
 
     safe_args = validate_args(args)
 
-    # Determine file extension
     ext = '.hcc' if any(kw in code for kw in ['thread ', 'thread[', 'atomic ', 'atomic{', 'chan ']) else '.c'
 
-    # Use a temp directory as cwd so TriCera writes dot files there
     workdir = tempfile.mkdtemp(prefix='tri_work_')
     tmppath = os.path.join(workdir, 'input' + ext)
     try:
@@ -321,15 +292,17 @@ def run_tricera(code, args):
             f.write(code)
 
         wants_graphs = any(a in safe_args for a in ['-pDot', '-dotCEX'])
-        if wants_graphs and '-pngNo' not in safe_args:
+        # -pDot alone: suppress the image viewer with -pngNo.
+        # Don't add -pngNo when -dotCEX is requested: Main.scala gates the CEX
+        # dot file generation on !pngNo, so -pngNo would lose the CEX graph.
+        if '-pDot' in safe_args and '-dotCEX' not in safe_args \
+           and '-pngNo' not in safe_args:
             safe_args.append('-pngNo')
 
-        # -printPP without CHC flags: skip verification with -t:0
-        chc_flags = ['-p', '-pDot', '-sp']
-        if '-printPP' in safe_args and not any(f in safe_args for f in chc_flags):
+        # -printPP alone: skip verification via -t:0
+        if '-printPP' in safe_args and not any(f in safe_args for f in ('-p', '-pDot', '-sp')):
             safe_args.append('-t:0')
 
-        # Build command after all arg modifications
         if SERVER_MODE:
             cmd = [
                 'nice', '-n', '19',
@@ -340,50 +313,75 @@ def run_tricera(code, args):
             cmd = [TRICERA_PATH] + safe_args + [tmppath]
 
         start = time.time()
+        aborted = False
 
         try:
-            proc = subprocess.run(
+            proc = subprocess.Popen(
                 cmd,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=HARD_TIMEOUT,
                 cwd=workdir,
                 env={
                     **os.environ,
                     'TRI_PP_PATH': os.path.dirname(TRICERA_PATH),
-                    'DISPLAY': '',  # suppress image viewer opening
+                    'DISPLAY': '',
                 },
+                preexec_fn=os.setsid,  # new process group so abort can kill the whole tree
             )
-            output = proc.stdout + proc.stderr
-        except subprocess.TimeoutExpired:
-            output = 'TIMEOUT'
+            if request_id:
+                with RUNNING_PROCS_LOCK:
+                    RUNNING_PROCS[request_id] = proc
+            try:
+                stdout, stderr = proc.communicate(timeout=HARD_TIMEOUT)
+                output = stdout + stderr
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                stdout, stderr = proc.communicate()
+                output = 'TIMEOUT'
+            finally:
+                if request_id:
+                    with RUNNING_PROCS_LOCK:
+                        RUNNING_PROCS.pop(request_id, None)
+            if proc.returncode == -signal.SIGKILL and 'TIMEOUT' not in output:
+                aborted = True
         except Exception as e:
             output = f'Other Error: {e}'
 
         elapsed = int((time.time() - start) * 1000)
 
+        if aborted:
+            return {
+                'status': 'ABORTED',
+                'message': 'Verification aborted by user.',
+                'diagnostics': [],
+                'rawOutput': output,
+                'elapsedMs': elapsed,
+            }
+
         result = parse_tricera_output(output, safe_args)
         result['rawOutput'] = output
         result['elapsedMs'] = elapsed
 
-        # Collect generated dot files and convert to PNG via graphviz
         if wants_graphs:
             result['graphImages'] = collect_graph_images(workdir)
 
         return result
     finally:
-        import shutil as _shutil
-        _shutil.rmtree(workdir, ignore_errors=True)
+        shutil.rmtree(workdir, ignore_errors=True)
 
 
 class TriceraHandler(SimpleHTTPRequestHandler):
-    """HTTP handler that serves static files and handles API endpoints."""
-
     def do_POST(self):
         path = urlparse(self.path).path
 
         if path == '/api/verify':
             self.handle_verify()
+        elif path == '/api/abort':
+            self.handle_abort()
         elif path == '/api/share':
             self.handle_share()
         else:
@@ -401,7 +399,6 @@ class TriceraHandler(SimpleHTTPRequestHandler):
         elif path == '/api/config':
             self.handle_config()
         else:
-            # Serve static files
             super().do_GET()
 
     def handle_verify(self):
@@ -411,11 +408,31 @@ class TriceraHandler(SimpleHTTPRequestHandler):
             return
 
         args = body.get('args', [])
-        result = run_tricera(body['code'], args)
+        request_id = body.get('requestId')
+        result = run_tricera(body['code'], args, request_id=request_id)
         remote_addr = self.client_address[0]
         log_submission(remote_addr, body['code'], args,
                        result.get('status', '?'), result.get('elapsedMs', 0))
         self.send_json(result)
+
+    def handle_abort(self):
+        body = self.read_json()
+        request_id = body.get('requestId') if body else None
+        if not request_id:
+            self.send_json({'error': 'No requestId provided'}, 400)
+            return
+        with RUNNING_PROCS_LOCK:
+            proc = RUNNING_PROCS.get(request_id)
+        if not proc:
+            self.send_json({'aborted': False, 'message': 'No running process for that requestId'})
+            return
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            self.send_json({'aborted': True})
+        except ProcessLookupError:
+            self.send_json({'aborted': False, 'message': 'Process already finished'})
+        except Exception as e:
+            self.send_json({'aborted': False, 'message': str(e)}, 500)
 
     def handle_config(self):
         self.send_json({
@@ -443,7 +460,6 @@ class TriceraHandler(SimpleHTTPRequestHandler):
     def handle_load(self):
         qs = parse_qs(urlparse(self.path).query)
         share_id = qs.get('id', [''])[0]
-        # Sanitize ID
         share_id = re.sub(r'[^a-f0-9]', '', share_id)
 
         share_path = os.path.join(SHARE_DIR, f'{share_id}.json')
@@ -480,7 +496,6 @@ class TriceraHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def log_message(self, format, *args):
-        # Only log API calls
         try:
             msg = format % args
         except Exception:
@@ -509,10 +524,8 @@ def main():
         MAX_TIMEOUT = 300
         HARD_TIMEOUT = 305
 
-    # Set working directory to script location (so static files are served correctly)
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    # Find TriCera
     TRICERA_PATH = args.tricera or find_tricera()
     SHARE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'shares')
     LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'log')
@@ -527,8 +540,8 @@ def main():
         print('  Set TRICERA_PATH environment variable, or use --tricera flag.')
         print('  The editor will work, but verification will fail.')
 
-    HTTPServer.allow_reuse_address = True
-    server = HTTPServer((args.host, args.port), TriceraHandler)
+    ThreadingHTTPServer.allow_reuse_address = True
+    server = ThreadingHTTPServer((args.host, args.port), TriceraHandler)
     print(f'Serving at http://{args.host}:{args.port}')
     print('Press Ctrl+C to stop.')
 

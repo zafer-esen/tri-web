@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@contract@*/
 void mod(int* t1, int* t2, int* t3, int* t4) {
     (*t1)++;

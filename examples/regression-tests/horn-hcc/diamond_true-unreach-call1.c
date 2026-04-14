@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 unsigned int __VERIFIER_nondet_uint(void);
 int main(void) {
   unsigned int x = 0;

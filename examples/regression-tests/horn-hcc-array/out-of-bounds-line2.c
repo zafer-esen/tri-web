@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -valid-deref -arithMode:ilp32
 #include <stdlib.h>
 #include <assert.h>
 

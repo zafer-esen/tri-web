@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 
 void swap(int **x, int **y){
     int* tmp = *x;

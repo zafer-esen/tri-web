@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -memsafety -arithMode:ilp32
 #include <stdlib.h>
 #include <assert.h>
 

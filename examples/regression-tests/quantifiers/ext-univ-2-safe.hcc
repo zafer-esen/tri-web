@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 void main() {
   int n = 3;
   int a[], b[];

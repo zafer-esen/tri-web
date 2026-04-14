@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int N = _;  // uninitialised
 int N2 = _;
 

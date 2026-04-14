@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 
 /* Nondeterministically initialized by command line option -forceNondetInit. */
 int a[5];

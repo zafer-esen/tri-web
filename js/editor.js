@@ -1,4 +1,3 @@
-// Monaco Editor manager
 const EditorManager = {
   editor: null,
   decorationIds: [],
@@ -20,7 +19,6 @@ const EditorManager = {
       fixedOverflowWidgets: true,
     });
 
-    // Ctrl+Enter to verify
     this.editor.addAction({
       id: 'tricera-verify',
       label: 'Verify with TriCera',
@@ -43,16 +41,19 @@ const EditorManager = {
   setMarkers(diagnostics) {
     if (!this.editor) return;
     const model = this.editor.getModel();
-    const markers = diagnostics.map(d => ({
-      severity: d.type === 'parse-error'
-        ? monaco.MarkerSeverity.Error
-        : monaco.MarkerSeverity.Warning,
-      message: d.message + (d.property ? ` (${d.property})` : ''),
-      startLineNumber: d.line,
-      startColumn: d.column || 1,
-      endLineNumber: d.line,
-      endColumn: model.getLineMaxColumn(d.line),
-    }));
+    const lineCount = model.getLineCount();
+    const markers = diagnostics
+      .filter(d => d.line >= 1 && d.line <= lineCount)
+      .map(d => ({
+        severity: d.type === 'parse-error'
+          ? monaco.MarkerSeverity.Error
+          : monaco.MarkerSeverity.Warning,
+        message: d.message + (d.property ? ` (${d.property})` : ''),
+        startLineNumber: d.line,
+        startColumn: d.column || 1,
+        endLineNumber: d.line,
+        endColumn: model.getLineMaxColumn(d.line),
+      }));
     monaco.editor.setModelMarkers(model, 'tricera', markers);
   },
 
@@ -64,26 +65,22 @@ const EditorManager = {
   setDecorations(status, lines) {
     if (!this.editor) return;
     const model = this.editor.getModel();
+    const lineCount = model.getLineCount();
     const decorations = [];
 
     if (status === 'safe') {
-      // Faint green on all lines
-      const lineCount = model.getLineCount();
       decorations.push({
         range: new monaco.Range(1, 1, lineCount, model.getLineMaxColumn(lineCount)),
         options: { className: 'safe-line-bg', isWholeLine: true },
       });
     } else if (status === 'unsafe') {
-      // Faint red on whole file
-      const lineCount = model.getLineCount();
       decorations.push({
         range: new monaco.Range(1, 1, lineCount, model.getLineMaxColumn(lineCount)),
         options: { className: 'unsafe-line-bg', isWholeLine: true },
       });
-      // Red gutter glyphs on specific lines
       if (lines && lines.length) {
         for (const line of lines) {
-          if (line >= 1 && line <= model.getLineCount()) {
+          if (line >= 1 && line <= lineCount) {
             decorations.push({
               range: new monaco.Range(line, 1, line, 1),
               options: {

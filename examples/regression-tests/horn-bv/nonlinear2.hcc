@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -arithMode:ilp32
 
 int nondet();
 

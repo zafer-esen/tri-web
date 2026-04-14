@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int N = _;
 int offset = _;
 

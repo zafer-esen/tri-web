@@ -1,5 +1,5 @@
-// A simple program where the assertion fails.
-// Result: UNSAFE (x is 10 after the loop, not 11)
+// TRICERA-OPTIONS: -cex
+// A failing assertion: x is 10 after the loop, not 11.
 
 void main() {
   int x = 0;

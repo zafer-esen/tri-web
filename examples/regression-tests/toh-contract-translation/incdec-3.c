@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 int a_init;
 int b_init;
 

@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 #define X 42
 
 void main() {

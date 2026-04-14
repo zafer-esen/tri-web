@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 // UNSAFE because `assigns *q;` and not `assigns **q;`.
 
 int g = 42;

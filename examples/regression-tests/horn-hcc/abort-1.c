@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int main() {
   int x = 42;
   if(x != 42) {

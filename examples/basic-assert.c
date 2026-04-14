@@ -1,5 +1,5 @@
+// TRICERA-OPTIONS: -cex
 // A simple loop where x and y stay equal.
-// Result: SAFE
 
 void main() {
   int x = 0;

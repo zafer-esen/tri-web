@@ -1,5 +1,6 @@
 const Verifier = {
   running: false,
+  currentRequestId: null,
 
   async verify() {
     if (this.running) return;
@@ -11,6 +12,10 @@ const Verifier = {
       return;
     }
 
+    const requestId = (crypto.randomUUID && crypto.randomUUID()) ||
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    this.currentRequestId = requestId;
+
     EditorManager.clearAll();
     OutputPanel.clear();
     this.setUIState('verifying');
@@ -20,7 +25,7 @@ const Verifier = {
       const resp = await fetch('api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, args }),
+        body: JSON.stringify({ code, args, requestId }),
       });
       if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
       this.handleResult(await resp.json());
@@ -28,10 +33,21 @@ const Verifier = {
       this.handleError(err);
     } finally {
       this.running = false;
-      const btn = document.getElementById('verify-btn');
-      btn.disabled = false;
-      btn.classList.remove('verifying');
-      btn.textContent = 'Verify';
+      this.currentRequestId = null;
+      this.setUIState('idle');
+    }
+  },
+
+  async abort() {
+    if (!this.running || !this.currentRequestId) return;
+    try {
+      await fetch('api/abort', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId: this.currentRequestId }),
+      });
+    } catch (err) {
+      console.error('Abort failed:', err);
     }
   },
 
@@ -51,19 +67,7 @@ const Verifier = {
     }
 
     OutputPanel.setStatus(status, result.message, result.elapsedMs);
-
-    let mainOutput = '';
-    if (status === 'unsafe' && result.counterexample)
-      mainOutput += 'Counterexample:\n' + result.counterexample + '\n\n';
-    if (result.diagnostics && result.diagnostics.length) {
-      for (const d of result.diagnostics) {
-        const prop = d.property ? ` (${d.property})` : '';
-        mainOutput += `${d.message} at line ${d.line}${prop}\n`;
-      }
-      mainOutput += '\n';
-    }
-    mainOutput += result.rawOutput || result.message || '';
-    OutputPanel.setContent('output', mainOutput);
+    OutputPanel.setContent('output', result.rawOutput || result.message || '');
 
     if (result.acsl) OutputPanel.setContent('acsl', result.acsl);
     if (result.chcs) OutputPanel.setContent('chcs', result.chcs);
@@ -88,12 +92,19 @@ const Verifier = {
   },
 
   setUIState(status) {
-    document.getElementById('status-bar').className = 'status-bar ' + status;
-    const btn = document.getElementById('verify-btn');
+    const bar = document.getElementById('status-bar');
+    bar.className = 'status-bar ' + (status === 'idle' ? '' : status);
+
+    const verifyBtn = document.getElementById('verify-btn');
+    const abortBtn = document.getElementById('abort-btn');
     if (status === 'verifying') {
-      btn.disabled = true;
-      btn.classList.add('verifying');
-      btn.textContent = 'Verifying...';
+      verifyBtn.disabled = true;
+      verifyBtn.classList.add('verifying');
+      abortBtn.disabled = false;
+    } else {
+      verifyBtn.disabled = false;
+      verifyBtn.classList.remove('verifying');
+      abortBtn.disabled = true;
     }
   },
 };

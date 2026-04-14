@@ -40,7 +40,7 @@ The Python backend (`serve.py`) and the PHP backend (`php/`) implement the same 
 
 # Sharing
 
-Programs can be shared via permalinks. Small programs are encoded client-side in the URL hash (`#code=...`). Larger programs are saved server-side and accessed via `?share=ID`. Both the code and the selected options are preserved.
+Programs can be shared via permalinks. Clicking "Share" saves the current code and selected options on the server and copies a `?share=<id>` URL to the clipboard. Opening such a URL restores the code and options.
 
 # Logging
 

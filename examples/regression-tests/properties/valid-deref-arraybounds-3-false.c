@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -valid-deref -arithMode:ilp32
 #include <stdlib.h>
 extern int nondet();
 

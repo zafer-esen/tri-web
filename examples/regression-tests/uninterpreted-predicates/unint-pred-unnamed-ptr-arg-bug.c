@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 /*$ P(int *) $*/
 
 int* nondet_ptr();

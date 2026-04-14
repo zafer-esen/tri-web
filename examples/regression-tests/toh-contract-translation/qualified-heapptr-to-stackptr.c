@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 #include <stdlib.h>
 
 /*@contract@*/

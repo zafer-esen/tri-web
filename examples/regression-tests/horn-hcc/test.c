@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int n = _;
 int a[n];
 

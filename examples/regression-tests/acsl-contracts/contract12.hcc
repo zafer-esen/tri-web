@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@ 
   requires \valid(p);
   ensures \result == 42;

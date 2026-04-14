@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -memsafety -valid-memcleanup -arithMode:ilp32
 void main() {
   int a[];
   a = alloca(sizeof(int)*42);

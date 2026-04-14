@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 // SAFE because assign to *p occurs after assign to g.
 int g = 0;
 

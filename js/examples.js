@@ -18,10 +18,8 @@ const ExamplesLoader = {
     {
       name: 'Memory Safety',
       examples: [
-        { id: 'mem-deref', name: 'Valid Dereference', file: 'mem-deref.c',
-          options: { properties: ['valid-deref'] } },
-        { id: 'mem-free', name: 'Double Free (UNSAFE)', file: 'mem-free.c',
-          options: { properties: ['valid-free'] } },
+        { id: 'mem-deref', name: 'Null Dereference (UNSAFE)', file: 'mem-deref.c' },
+        { id: 'mem-free', name: 'Double Free (UNSAFE)', file: 'mem-free.c' },
       ],
     },
     {
@@ -33,23 +31,34 @@ const ExamplesLoader = {
     {
       name: 'ACSL Contracts',
       examples: [
-        { id: 'acsl-max', name: 'Max Function', file: 'acsl-max.c',
-          options: { output: ['acsl'] } },
+        { id: 'acsl-max', name: 'Max Function', file: 'acsl-max.c' },
       ],
     },
   ],
 
-  // Regression test categories loaded from JSON manifest
   regressionCategories: [],
+  expandedCategories: new Set(),
 
-  init(selectEl) {
-    this.selectEl = selectEl;
-    this.render();
-    this.selectEl.addEventListener('change', e => {
-      if (e.target.value) this.loadExample(e.target.value);
+  init(button, panel) {
+    this.button = button;
+    this.panel = panel;
+    this.labelEl = button.querySelector('.examples-label');
+
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._togglePanel();
     });
-    // Load regression tests manifest asynchronously
+    document.addEventListener('click', (e) => {
+      if (!this.panel.contains(e.target) && e.target !== this.button) {
+        this._closePanel();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this._closePanel();
+    });
+
     this._loadRegressionTests();
+    this.render();
   },
 
   async _loadRegressionTests() {
@@ -58,42 +67,88 @@ const ExamplesLoader = {
       if (!resp.ok) return;
       this.regressionCategories = await resp.json();
       this.render();
-    } catch (e) {
-      // Regression tests not available (e.g., not deployed)
+    } catch (e) {}
+  },
+
+  _togglePanel() {
+    if (this.panel.style.display === 'none') {
+      this.panel.style.display = '';
+    } else {
+      this._closePanel();
     }
   },
 
-  render() {
-    this.selectEl.innerHTML = '<option value="">Load Example...</option>';
+  _closePanel() {
+    this.panel.style.display = 'none';
+  },
 
-    // Curated examples
+  render() {
+    this.panel.innerHTML = '';
+
     for (const cat of this.categories) {
-      this._addOptgroup(cat);
+      const group = document.createElement('div');
+      group.className = 'examples-group';
+      const header = document.createElement('div');
+      header.className = 'examples-group-header';
+      header.textContent = cat.name;
+      group.appendChild(header);
+      for (const ex of cat.examples) {
+        group.appendChild(this._makeItem(ex));
+      }
+      this.panel.appendChild(group);
     }
 
-    // Regression tests (grouped under a separator)
     if (this.regressionCategories.length) {
-      const sep = document.createElement('optgroup');
-      sep.label = '--- Regression Tests ---';
-      sep.disabled = true;
-      this.selectEl.appendChild(sep);
+      const sep = document.createElement('div');
+      sep.className = 'examples-separator';
+      sep.textContent = 'Regression tests';
+      this.panel.appendChild(sep);
 
       for (const cat of this.regressionCategories) {
-        this._addOptgroup(cat);
+        const group = document.createElement('div');
+        group.className = 'examples-group collapsible';
+        const expanded = this.expandedCategories.has(cat.name);
+        if (expanded) group.classList.add('expanded');
+
+        const header = document.createElement('div');
+        header.className = 'examples-group-header collapsible';
+        header.innerHTML = `
+          <span class="examples-group-arrow">${expanded ? '\u25BE' : '\u25B8'}</span>
+          <span class="examples-group-name">${cat.name}</span>
+          <span class="examples-group-count">${cat.examples.length}</span>`;
+        header.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (this.expandedCategories.has(cat.name)) {
+            this.expandedCategories.delete(cat.name);
+          } else {
+            this.expandedCategories.add(cat.name);
+          }
+          this.render();
+        });
+        group.appendChild(header);
+
+        if (expanded) {
+          const items = document.createElement('div');
+          items.className = 'examples-group-items';
+          for (const ex of cat.examples) {
+            items.appendChild(this._makeItem(ex));
+          }
+          group.appendChild(items);
+        }
+        this.panel.appendChild(group);
       }
     }
   },
 
-  _addOptgroup(cat) {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = cat.name;
-    for (const ex of cat.examples) {
-      const opt = document.createElement('option');
-      opt.value = ex.id;
-      opt.textContent = ex.name;
-      optgroup.appendChild(opt);
-    }
-    this.selectEl.appendChild(optgroup);
+  _makeItem(ex) {
+    const item = document.createElement('div');
+    item.className = 'examples-item';
+    item.textContent = ex.name;
+    item.addEventListener('click', () => {
+      this.loadExample(ex.id);
+      this._closePanel();
+    });
+    return item;
   },
 
   async loadExample(id) {
@@ -104,22 +159,27 @@ const ExamplesLoader = {
       const resp = await fetch('examples/' + example.file);
       if (!resp.ok) throw new Error('Failed to load example');
       const code = await resp.text();
+
+      const firstLines = code.split('\n').slice(0, 5).join('\n');
+      const m = firstLines.match(/\/\/\s*TRICERA-OPTIONS:\s*(.+)/);
+      if (m) {
+        const flags = m[1].trim().split(/\s+/);
+        const state = OptionsPanel.cliArgsToState(flags);
+        OptionsPanel.setState(state);
+      } else {
+        OptionsPanel.resetState();
+        OptionsPanel._fullRerender();
+      }
+
       EditorManager.setCode(code);
       OutputPanel.clear();
       OutputPanel.setStatus('idle');
       document.getElementById('status-bar').className = 'status-bar';
 
-      // Apply recommended options if any
-      if (example.options) {
-        OptionsPanel.resetState();
-        OptionsPanel.setState(example.options);
-      }
+      if (this.labelEl) this.labelEl.textContent = example.name;
     } catch (err) {
       console.error('Failed to load example:', err);
     }
-
-    // Reset dropdown
-    this.selectEl.value = '';
   },
 
   findExample(id) {

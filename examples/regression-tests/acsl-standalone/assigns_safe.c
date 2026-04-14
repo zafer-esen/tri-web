@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 /*@
   requires \valid(p);
   assigns \nothing;

@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 extern void __VERIFIER_error(void);
 extern void __VERIFIER_assume(int);
 void __VERIFIER_assert(int cond) {

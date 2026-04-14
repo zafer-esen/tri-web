@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 struct Node {
   struct Node* left;
   struct Node* right;

@@ -1,5 +1,5 @@
-// Swap two values via pointers using heap allocation.
-// Result: SAFE
+// TRICERA-OPTIONS: -cex
+// Swap two values via pointers and heap allocation.
 
 void swap(int *x, int *y) {
   int tmp = *x;

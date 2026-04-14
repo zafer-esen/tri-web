@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@ 
   ensures \forall int i; i >= 0 ==> i > \result;
 */

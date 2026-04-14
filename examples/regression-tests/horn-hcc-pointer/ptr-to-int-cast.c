@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 #include <stdlib.h>
 
 void main() {

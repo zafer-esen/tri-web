@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 // Relies solely on specified post condition, not implementation.
 
 /*@

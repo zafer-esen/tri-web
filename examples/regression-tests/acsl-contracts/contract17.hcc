@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 // UNSAFE because modifies g.
 
 int g = 1;

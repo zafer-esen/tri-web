@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native -valid-deref -arithMode:ilp32
 struct S {
   int f;
 };

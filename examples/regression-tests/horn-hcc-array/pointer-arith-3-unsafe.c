@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -valid-deref -arithMode:ilp32
 int a[];
 
 void main() {

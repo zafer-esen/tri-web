@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@
   requires \valid(p, q);
   ensures \result == *p || \result == *q;

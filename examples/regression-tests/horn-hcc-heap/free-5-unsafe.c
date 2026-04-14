@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 int nondet();
 
 void main() {

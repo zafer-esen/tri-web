@@ -11,9 +11,13 @@
     <div class="header-left">
       <span class="logo">TriCera</span>
       <span class="version">v0.4</span>
-      <select id="examples-select" class="examples-select">
-        <option value="">Load example...</option>
-      </select>
+      <div class="examples-dropdown" id="examples-dropdown">
+        <button class="examples-button" id="examples-button" type="button">
+          <span class="examples-label">Load example...</span>
+          <span class="examples-arrow">&#9662;</span>
+        </button>
+        <div class="examples-panel" id="examples-panel" style="display:none"></div>
+      </div>
     </div>
     <div class="header-right">
       <button id="help-btn" class="header-btn" title="Show help">Help</button>
@@ -69,7 +73,14 @@
     </div>
 
     <div class="options-panel" id="options-panel">
-      <button id="verify-btn" class="verify-btn">Verify</button>
+      <div class="verify-buttons">
+        <button id="verify-btn" class="verify-btn" title="Verify (Ctrl+Enter)">
+          <span class="btn-icon">&#9654;</span><span class="btn-label">Verify</span>
+        </button>
+        <button id="abort-btn" class="abort-btn" title="Abort verification" disabled>
+          <span class="btn-icon">&#9724;</span><span class="btn-label">Abort</span>
+        </button>
+      </div>
       <div id="options-container"></div>
     </div>
   </div>

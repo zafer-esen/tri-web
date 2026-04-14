@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 typedef enum {false, true} _bool;
 
 _bool nondet_bool(void);

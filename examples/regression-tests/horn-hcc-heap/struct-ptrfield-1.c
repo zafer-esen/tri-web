@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native -memsafety -arithMode:ilp32
 struct S {
   int *f;
 };

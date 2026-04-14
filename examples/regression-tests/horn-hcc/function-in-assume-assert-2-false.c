@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int subOne(int x){
   return x - 1;
 }

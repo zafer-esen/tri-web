@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 // see https://github.com/uuverifiers/tricera/issues/36
 
 void main(void) {

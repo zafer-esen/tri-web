@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@
   requires x >= 0 && x <= 4;
   ensures \result >= 10 && \result <= 14;

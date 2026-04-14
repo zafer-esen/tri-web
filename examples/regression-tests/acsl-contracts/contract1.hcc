@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@
   requires x >= 0;
   ensures \result == 2;

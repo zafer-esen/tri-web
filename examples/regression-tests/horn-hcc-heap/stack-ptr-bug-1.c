@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 #include <stdlib.h>
 
 struct S { int data; };

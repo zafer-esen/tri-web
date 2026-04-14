@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 // FIXME: Currently gives error when producing CEX. Update answer when fixed.
 
 /*@

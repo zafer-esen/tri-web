@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 void main() {
   int n = _;
   assume(n > 0);

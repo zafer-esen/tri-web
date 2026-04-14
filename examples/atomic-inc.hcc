@@ -1,6 +1,6 @@
+// TRICERA-OPTIONS: -cex
 // Two threads atomically increment a shared counter.
 // Thread B checks that if A has finished, x must be 2.
-// Result: SAFE
 
 int x = 0;
 int finished = 0;

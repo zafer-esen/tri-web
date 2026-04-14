@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 struct S3{
     int a;
 };

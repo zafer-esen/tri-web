@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 
 int r1;
 int n_init;

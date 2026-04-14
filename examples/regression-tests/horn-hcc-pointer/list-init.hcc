@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 struct list{
   int k;
 }

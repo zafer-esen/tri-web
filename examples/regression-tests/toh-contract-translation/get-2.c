@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 // TODO: This test currently results in 
 //
 // java.lang.Exception: Predicate generation failed

@@ -1,6 +1,5 @@
-// Null pointer dereference: writing through a null pointer.
-// Check with property: Valid Dereferences
-// Result: UNSAFE (valid-deref violated)
+// TRICERA-OPTIONS: -cex -valid-deref
+// Null pointer dereference.
 
 void main() {
   int *p = 0;

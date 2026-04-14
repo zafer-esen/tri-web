@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int *x = ((void *)0);
 int** y = (int**)&x;
 

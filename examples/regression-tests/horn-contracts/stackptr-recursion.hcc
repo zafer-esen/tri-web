@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 /* 
   NOTE: 2025-03-27: Stackpointers does currently not work
     together with recursion. In a situation as the following

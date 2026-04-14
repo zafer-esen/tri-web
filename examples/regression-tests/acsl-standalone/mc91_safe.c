@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 /*@
   ensures n <= 100 ==> \result == 91;
   ensures n > 100 ==> \result == n-10;

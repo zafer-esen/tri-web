@@ -36,17 +36,11 @@ const TriceraLanguage = {
 
       tokenizer: {
         root: [
-          // ACSL annotations: /*@ ... */
           [/\/\*@/, 'comment.doc', '@acslBlock'],
-          // Block comments
           [/\/\*/, 'comment', '@comment'],
-          // Line comments
           [/\/\/.*$/, 'comment'],
-          // Preprocessor
           [/^\s*#\s*\w+/, 'keyword.preprocessor'],
-          // __VERIFIER functions
           [/\b__VERIFIER_\w+\b/, 'keyword.tricera'],
-          // Identifiers and keywords
           [/[a-zA-Z_]\w*/, {
             cases: {
               '@triceraKeywords': 'keyword.tricera',
@@ -55,28 +49,21 @@ const TriceraLanguage = {
               '@default': 'identifier',
             }
           }],
-          // Numbers
           [/0[xX][0-9a-fA-F]+[uUlL]*/, 'number.hex'],
           [/0[0-7]+[uUlL]*/, 'number.octal'],
           [/\d+(\.\d+)?([eE][-+]?\d+)?[fFlLuU]*/, 'number'],
-          // Strings
           [/"([^"\\]|\\.)*$/, 'string.invalid'],
           [/"/, 'string', '@string'],
-          // Characters
           [/'[^\\']'/, 'string.char'],
           [/'(\\.)+'/, 'string.char'],
-          // Brackets
           [/[{}()\[\]]/, '@brackets'],
-          // Operators
           [/@symbols/, {
             cases: {
               '@operators': 'operator',
               '@default': '',
             }
           }],
-          // Delimiters
           [/[;,]/, 'delimiter'],
-          // Whitespace
           [/\s+/, 'white'],
         ],
 
@@ -103,7 +90,6 @@ const TriceraLanguage = {
       },
     });
 
-    // Custom dark theme
     monaco.editor.defineTheme('tricera-dark', {
       base: 'vs-dark',
       inherit: true,
@@ -129,7 +115,6 @@ const TriceraLanguage = {
       },
     });
 
-    // Hover provider for TriCera keywords
     monaco.languages.registerHoverProvider('tricera-c', {
       provideHover(model, position) {
         const word = model.getWordAtPosition(position);

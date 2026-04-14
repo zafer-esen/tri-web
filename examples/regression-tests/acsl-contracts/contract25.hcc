@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 // SAFE because only *p assigned.
 
 /*@

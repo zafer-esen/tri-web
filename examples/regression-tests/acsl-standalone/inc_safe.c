@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 /*@
   requires x >= 0;
   ensures \result >= 1;

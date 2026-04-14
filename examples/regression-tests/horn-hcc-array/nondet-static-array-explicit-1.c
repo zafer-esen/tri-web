@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 
 void main() {
     static int a[5] = _;

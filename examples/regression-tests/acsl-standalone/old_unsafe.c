@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 // UNSAFE because assign to *p occurs before assign to g.
 int g = 0;
 

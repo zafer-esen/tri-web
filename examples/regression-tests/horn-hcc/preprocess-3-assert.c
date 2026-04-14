@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 #include "assert.h"
 
 int main() {

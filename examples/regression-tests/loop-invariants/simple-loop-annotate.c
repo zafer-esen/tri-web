@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -inv -acsl -cex
 /*@
   requires \true;
   ensures \true;

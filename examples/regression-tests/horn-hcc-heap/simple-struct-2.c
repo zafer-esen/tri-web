@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 typedef struct {
   int x;
   struct {

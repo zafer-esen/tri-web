@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 
 
 int M = 40, mm, n, mpt = M + 1;

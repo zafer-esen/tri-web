@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -memsafety -arithMode:ilp32
 int a[];
 
 void main() {

@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@ 
   requires n >= 0; 
   ensures n >= 0; 

@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@
   requires n == 2;
   ensures \result == 12;

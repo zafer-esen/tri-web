@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -mathArrays -sol
 #include <assert.h>
 
 void main() {

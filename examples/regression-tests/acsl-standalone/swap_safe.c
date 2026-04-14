@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 /*@
   requires \valid(a) && \valid(b);
   assigns  *a, *b;

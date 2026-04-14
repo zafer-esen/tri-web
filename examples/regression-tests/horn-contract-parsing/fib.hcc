@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 /*@
   requires n >= 0; 
   ensures n >= 0;

@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 /*@contract@*/
 static void f1(int *p)
 {

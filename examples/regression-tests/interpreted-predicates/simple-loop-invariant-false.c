@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 /*$
 P(int x, int i, int n) {
   x == i*n && i <= n //0 <= i not needed

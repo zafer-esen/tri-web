@@ -1,6 +1,5 @@
-// Loop invariant: i is always non-negative and bounded.
-// TriCera infers the invariant automatically.
-// Result: SAFE
+// TRICERA-OPTIONS: -cex -inv -acsl
+// TriCera infers a loop invariant automatically.
 
 void main() {
   int n = 100;

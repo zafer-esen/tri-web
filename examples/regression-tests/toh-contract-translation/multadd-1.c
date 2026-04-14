@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 /*@contract@*/
 void multiplyByTwo(int* num) {
     *num = *num * 2;

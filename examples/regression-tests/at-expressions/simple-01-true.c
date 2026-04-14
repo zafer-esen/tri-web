@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 typedef int INTEGER;
 
 int main() {

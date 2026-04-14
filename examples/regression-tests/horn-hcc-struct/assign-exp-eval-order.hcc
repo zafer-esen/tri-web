@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 struct {
     int x;
     int y;

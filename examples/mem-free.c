@@ -1,10 +1,8 @@
-// Use after free: accessing memory that was already freed.
-// Check with property: Valid Free
-// Result: UNSAFE
+// TRICERA-OPTIONS: -cex -valid-free
+// Double free: the same allocation is freed twice.
 
 void main() {
   int *a = malloc(sizeof(int));
-  *a = 10;
   free(a);
-  *a = 42;  // use after free!
+  free(a);
 }

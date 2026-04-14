@@ -8,9 +8,13 @@
     EditorManager.init(document.getElementById('editor-container'));
     OptionsPanel.init(document.getElementById('options-container'));
     OutputPanel.init();
-    ExamplesLoader.init(document.getElementById('examples-select'));
+    ExamplesLoader.init(
+      document.getElementById('examples-button'),
+      document.getElementById('examples-panel')
+    );
 
     document.getElementById('verify-btn').addEventListener('click', () => Verifier.verify());
+    document.getElementById('abort-btn').addEventListener('click', () => Verifier.abort());
     document.getElementById('share-btn').addEventListener('click', () => ShareManager.share());
     document.getElementById('help-btn').addEventListener('click', () => {
       const panel = document.getElementById('help-panel');

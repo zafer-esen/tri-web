@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex -heapModel:native
 void main() {
   int *x = calloc(sizeof(int));
   *x += 42;

@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 
 
 int tak(int x, int y, int z) {

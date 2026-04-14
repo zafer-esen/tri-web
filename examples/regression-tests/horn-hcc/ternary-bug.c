@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 void main() {
   int x, y;
   int z = y;

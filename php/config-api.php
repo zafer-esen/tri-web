@@ -4,7 +4,6 @@ header('Access-Control-Allow-Origin: *');
 
 require_once __DIR__ . '/config.php';
 
-// Detect TriCera version
 $version = null;
 if (is_executable($TRICERA_PATH)) {
     $out = shell_exec(escapeshellarg($TRICERA_PATH) . ' --version 2>&1');

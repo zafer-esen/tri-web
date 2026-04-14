@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -cex
 // SAFE
 
 int g = 42;

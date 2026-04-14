@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 // Use the option -abstract for thread-modular verification
 // (otherwise verification might diverge)
 

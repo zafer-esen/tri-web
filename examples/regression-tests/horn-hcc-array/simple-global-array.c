@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int a[10];
 
 void main() {

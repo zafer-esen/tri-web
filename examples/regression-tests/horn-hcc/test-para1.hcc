@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 int gid = _;
 
 thread[id] Proc {

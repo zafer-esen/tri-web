@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 
 void main() {
     /* Nondeterministically initialized by command line option -forceNondetInit. */

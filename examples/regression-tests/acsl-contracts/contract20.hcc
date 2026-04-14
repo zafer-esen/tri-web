@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 // UNSAFE as *p might have changed.
 
 /*@

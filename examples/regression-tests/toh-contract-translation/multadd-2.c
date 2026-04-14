@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: 
 
 /*@contract@*/
 void addNumbers(int* x, int* y, int* result) {

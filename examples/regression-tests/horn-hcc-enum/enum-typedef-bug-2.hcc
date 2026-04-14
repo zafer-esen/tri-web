@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 // See https://github.com/uuverifiers/tricera/issues/60
 
 typedef enum {

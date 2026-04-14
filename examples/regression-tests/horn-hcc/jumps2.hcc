@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -cex
 
 int g = 0;
 

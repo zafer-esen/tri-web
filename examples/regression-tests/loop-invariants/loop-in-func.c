@@ -1,3 +1,4 @@
+// TRICERA-OPTIONS: -m:foo -inv -acsl -cex
 /*@contract@*/
 void value() {
   for (int i = 0; i < 3; ++i) {

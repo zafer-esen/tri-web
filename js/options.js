@@ -33,114 +33,53 @@ const OptionsPanel = {
           default: false,
           help: 'Verify each property independently rather than all at once. Can make individual verification tasks easier.',
         },
-        {
-          id: 'forceNondetInit',
-          label: 'Non-deterministic initialization',
-          type: 'toggle',
-          cliArg: '-forceNondetInit',
-          default: false,
-          help: 'Initialize static and global variables to non-deterministic values instead of the default zero.',
-        },
       ],
     },
     {
-      title: 'Verification engine',
+      title: 'Basic settings',
       groups: [
         {
-          id: 'backend',
-          label: 'Backend',
+          id: 'arithmetic',
+          label: 'Integer arithmetic',
           type: 'select',
           options: [
-            { value: 'cegar', label: 'CEGAR (default)', cliArg: null },
-            { value: 'sym-bfs', label: 'Symbolic execution (breadth-first)', cliArg: '-sym:bfs' },
-            { value: 'sym-dfs', label: 'Symbolic execution (depth-first)', cliArg: '-sym:dfs' },
+            { value: 'math', label: 'Mathematical (unbounded)', cliArg: '-arithMode:math' },
+            { value: 'ilp32', label: 'ILP32 (32-bit int)', cliArg: '-arithMode:ilp32' },
+            { value: 'lp64', label: 'LP64 (64-bit long)', cliArg: '-arithMode:lp64' },
+            { value: 'llp64', label: 'LLP64 (Windows 64-bit)', cliArg: '-arithMode:llp64' },
           ],
-          default: 'cegar',
-          help: 'CEGAR uses counterexample-guided abstraction refinement. Symbolic execution explores program paths directly (experimental).',
+          default: 'math',
+          help: 'Integer semantics. Mathematical uses unbounded integers (default). ILP32/LP64/LLP64 model machine-specific integer sizes with overflow.',
         },
         {
-          id: 'abstract',
-          label: 'Interpolation abstraction',
-          type: 'select',
-          options: [
-            { value: 'portfolio', label: 'Portfolio (default)', cliArg: '-abstractPO' },
-            { value: 'off', label: 'Off', cliArg: '-abstract:off' },
-            { value: 'term', label: 'Term', cliArg: '-abstract:term' },
-            { value: 'oct', label: 'Octagon', cliArg: '-abstract:oct' },
-            { value: 'relEqs', label: 'Relational equalities', cliArg: '-abstract:relEqs' },
-            { value: 'relIneqs', label: 'Relational inequalities', cliArg: '-abstract:relIneqs' },
-            { value: 'relEqs2', label: 'Relational equalities v2', cliArg: '-abstract:relEqs2' },
-            { value: 'relIneqs2', label: 'Relational inequalities v2', cliArg: '-abstract:relIneqs2' },
-          ],
-          default: 'portfolio',
-          help: 'Controls how interpolants are abstracted during CEGAR. Portfolio runs with and without abstraction in parallel.',
-          visible: () => OptionsPanel.state.backend === 'cegar',
-        },
-        {
-          id: 'abstractTO',
-          label: 'Abstraction timeout (seconds)',
+          id: 'timeout',
+          label: 'Timeout (seconds)',
           type: 'number',
-          cliArgPrefix: '-abstractTO:',
-          default: 2,
+          cliArgPrefix: '-t:',
+          default: 30,
           min: 1,
-          max: 30,
-          help: 'Timeout for the abstraction template search.',
-          visible: () => OptionsPanel.state.backend === 'cegar'
-            && !['portfolio', 'off'].includes(OptionsPanel.state.abstract),
+          max: 60,
+          help: 'Maximum verification time (up to 60 seconds).',
         },
         {
-          id: 'disj',
-          label: 'Disjunctive interpolation',
-          type: 'toggle',
-          cliArg: '-disj',
-          default: false,
-          help: 'Use disjunctive interpolation for more precise invariants (may be slower).',
-          visible: () => OptionsPanel.state.backend === 'cegar',
+          id: 'entryFunction',
+          label: 'Entry function',
+          type: 'text',
+          cliArgPrefix: '-m:',
+          default: 'main',
+          help: 'The function to use as the program entry point.',
         },
         {
-          id: 'solReconstruction',
-          label: 'Solution reconstruction',
+          id: 'preprocessor',
+          label: 'C preprocessor',
           type: 'select',
           options: [
-            { value: 'wp', label: 'Weakest preconditions (default)', cliArg: null },
-            { value: 'cegar', label: 'CEGAR-based', cliArg: '-solutionReconstruction:cegar' },
+            { value: 'default', label: 'None', cliArg: null },
+            { value: 'cpp', label: 'Full (cpp)', cliArg: '-cpp' },
+            { value: 'cppLight', label: 'Light (no system headers)', cliArg: '-cppLight' },
           ],
-          default: 'wp',
-          help: 'Method for reconstructing solutions from proofs. CEGAR-based may produce different invariants.',
-        },
-        {
-          id: 'symDepth',
-          label: 'Max depth',
-          type: 'number',
-          cliArgPrefix: '-symDepth:',
-          default: '',
-          min: 1,
-          max: 1000,
-          help: 'Maximum depth for symbolic execution (underapproximation). Leave empty for unlimited.',
-          visible: () => OptionsPanel.state.backend === 'sym-bfs',
-        },
-        {
-          id: 'slicing',
-          label: 'Clause slicing',
-          type: 'select',
-          options: [
-            { value: 'yes', label: 'Yes (default)', cliArg: null },
-            { value: 'no', label: 'No', cliArg: '-noSlicing' },
-          ],
-          default: 'yes',
-          help: 'Clause slicing removes irrelevant parts of clauses to speed up solving.',
-        },
-        {
-          id: 'splitClauses',
-          label: 'Split disjunctions in clauses',
-          type: 'select',
-          options: [
-            { value: '0', label: "Don't split (0)", cliArg: '-splitClauses:0' },
-            { value: '1', label: 'Default (1)', cliArg: null },
-            { value: '2', label: 'Aggressive (2)', cliArg: '-splitClauses:2' },
-          ],
-          default: '1',
-          help: 'How aggressively to split disjunctions in Horn clauses. Higher values may help with some programs but increase clause count.',
+          default: 'default',
+          help: 'Run the C preprocessor (cpp) on the input before TriCera\'s own preprocessor (tri-pp). Light mode skips system headers.',
         },
       ],
     },
@@ -220,20 +159,105 @@ const OptionsPanel = {
       ],
     },
     {
-      title: 'Settings',
+      title: 'Advanced',
+      collapsible: true,
+      collapsed: true,
       groups: [
         {
-          id: 'arithmetic',
-          label: 'Integer arithmetic',
+          id: 'backend',
+          label: 'Backend',
           type: 'select',
           options: [
-            { value: 'math', label: 'Mathematical (unbounded)', cliArg: '-arithMode:math' },
-            { value: 'ilp32', label: 'ILP32 (32-bit int)', cliArg: '-arithMode:ilp32' },
-            { value: 'lp64', label: 'LP64 (64-bit long)', cliArg: '-arithMode:lp64' },
-            { value: 'llp64', label: 'LLP64 (Windows 64-bit)', cliArg: '-arithMode:llp64' },
+            { value: 'cegar', label: 'CEGAR (default)', cliArg: null },
+            { value: 'sym-bfs', label: 'Symbolic execution (breadth-first)', cliArg: '-sym:bfs' },
+            { value: 'sym-dfs', label: 'Symbolic execution (depth-first)', cliArg: '-sym:dfs' },
           ],
-          default: 'math',
-          help: 'Integer semantics. Mathematical uses unbounded integers (default). ILP32/LP64/LLP64 model machine-specific integer sizes with overflow.',
+          default: 'cegar',
+          help: 'CEGAR uses counterexample-guided abstraction refinement. Symbolic execution explores program paths directly (experimental).',
+        },
+        {
+          id: 'abstract',
+          label: 'Interpolation abstraction',
+          type: 'select',
+          options: [
+            { value: 'portfolio', label: 'Portfolio (default)', cliArg: '-abstractPO' },
+            { value: 'off', label: 'Off', cliArg: '-abstract:off' },
+            { value: 'term', label: 'Term', cliArg: '-abstract:term' },
+            { value: 'oct', label: 'Octagon', cliArg: '-abstract:oct' },
+            { value: 'relEqs', label: 'Relational equalities', cliArg: '-abstract:relEqs' },
+            { value: 'relIneqs', label: 'Relational inequalities', cliArg: '-abstract:relIneqs' },
+            { value: 'relEqs2', label: 'Relational equalities v2', cliArg: '-abstract:relEqs2' },
+            { value: 'relIneqs2', label: 'Relational inequalities v2', cliArg: '-abstract:relIneqs2' },
+          ],
+          default: 'portfolio',
+          help: 'Controls how interpolants are abstracted during CEGAR. Portfolio runs with and without abstraction in parallel.',
+          visible: () => OptionsPanel.state.backend === 'cegar',
+        },
+        {
+          id: 'abstractTO',
+          label: 'Abstraction timeout (seconds)',
+          type: 'number',
+          cliArgPrefix: '-abstractTO:',
+          default: 2,
+          min: 1,
+          max: 30,
+          help: 'Timeout for the abstraction template search.',
+          visible: () => OptionsPanel.state.backend === 'cegar'
+            && !['portfolio', 'off'].includes(OptionsPanel.state.abstract),
+        },
+        {
+          id: 'disj',
+          label: 'Disjunctive interpolation',
+          type: 'toggle',
+          cliArg: '-disj',
+          default: false,
+          help: 'Use disjunctive interpolation for more precise invariants (may be slower).',
+          visible: () => OptionsPanel.state.backend === 'cegar',
+        },
+        {
+          id: 'solReconstruction',
+          label: 'Solution reconstruction',
+          type: 'select',
+          options: [
+            { value: 'wp', label: 'Weakest preconditions (default)', cliArg: null },
+            { value: 'cegar', label: 'CEGAR-based', cliArg: '-solutionReconstruction:cegar' },
+          ],
+          default: 'wp',
+          help: 'Method for reconstructing solutions from proofs. CEGAR-based may produce different invariants.',
+        },
+        {
+          id: 'symDepth',
+          label: 'Max symex depth',
+          type: 'number',
+          cliArgPrefix: '-symDepth:',
+          default: '',
+          min: 1,
+          max: 1000,
+          help: 'Maximum depth for symbolic execution (underapproximation). Leave empty for unlimited.',
+          visible: () => OptionsPanel.state.backend === 'sym-bfs',
+        },
+        {
+          id: 'slicing',
+          label: 'Clause slicing',
+          type: 'select',
+          options: [
+            { value: 'yes', label: 'Yes (default)', cliArg: null },
+            { value: 'no', label: 'No', cliArg: '-noSlicing' },
+          ],
+          default: 'yes',
+          help: 'Clause slicing removes irrelevant parts of clauses to speed up solving.',
+        },
+        {
+          id: 'splitClauses',
+          label: 'Split disjunctions in clauses',
+          type: 'select',
+          options: [
+            { value: '0', label: "Don't split (0)", cliArg: '-splitClauses:0' },
+            { value: '1', label: 'Default (1)', cliArg: null },
+            { value: '2', label: 'Aggressive (2)', cliArg: '-splitClauses:2' },
+          ],
+          default: '1',
+          help: 'How aggressively to split disjunctions in Horn clauses. Higher values may help with some programs but increase clause count.',
         },
         {
           id: 'heapModel',
@@ -258,34 +282,12 @@ const OptionsPanel = {
           help: 'How to model C arrays. Theory of heaps allocates arrays on the heap. Mathematical arrays are unbounded and skip memory safety checks on arrays.',
         },
         {
-          id: 'preprocessor',
-          label: 'C preprocessor',
-          type: 'select',
-          options: [
-            { value: 'default', label: 'None', cliArg: null },
-            { value: 'cpp', label: 'Full (cpp)', cliArg: '-cpp' },
-            { value: 'cppLight', label: 'Light (no system headers)', cliArg: '-cppLight' },
-          ],
-          default: 'default',
-          help: 'Run the C preprocessor (cpp) on the input before TriCera\'s own preprocessor (tri-pp). Light mode skips system headers.',
-        },
-        {
-          id: 'entryFunction',
-          label: 'Entry function',
-          type: 'text',
-          cliArgPrefix: '-m:',
-          default: 'main',
-          help: 'The function to use as the program entry point.',
-        },
-        {
-          id: 'timeout',
-          label: 'Timeout (seconds)',
-          type: 'number',
-          cliArgPrefix: '-t:',
-          default: 30,
-          min: 1,
-          max: 60,
-          help: 'Maximum verification time (up to 60 seconds).',
+          id: 'forceNondetInit',
+          label: 'Non-deterministic initialization',
+          type: 'toggle',
+          cliArg: '-forceNondetInit',
+          default: false,
+          help: 'Initialize static and global variables to non-deterministic values instead of the default zero.',
         },
       ],
     },
@@ -314,24 +316,50 @@ const OptionsPanel = {
     for (const sec of this.sections) {
       const header = document.createElement('div');
       header.className = 'option-section-title';
-      header.textContent = sec.title;
+      if (sec.collapsible) header.classList.add('collapsible');
+      if (sec.collapsed) header.classList.add('collapsed');
+      header.dataset.sectionTitle = sec.title;
+      const arrow = sec.collapsible ? (sec.collapsed ? '\u25B8 ' : '\u25BE ') : '';
+      header.textContent = arrow + sec.title;
       this.container.appendChild(header);
+
+      const body = document.createElement('div');
+      body.className = 'option-section-body';
+      if (sec.collapsed) body.style.display = 'none';
+      this.container.appendChild(body);
+
+      if (sec.collapsible) {
+        header.addEventListener('click', () => {
+          sec.collapsed = !sec.collapsed;
+          header.classList.toggle('collapsed', sec.collapsed);
+          body.style.display = sec.collapsed ? 'none' : '';
+          header.textContent = (sec.collapsed ? '\u25B8 ' : '\u25BE ') + sec.title;
+        });
+      }
 
       for (const group of sec.groups) {
         const el = document.createElement('div');
         el.className = 'option-group';
         el.dataset.groupId = group.id;
-        if (group.visible && !group.visible()) {
-          el.style.display = 'none';
-        }
+        if (group.visible && !group.visible()) el.style.display = 'none';
         if (group.label && group.type !== 'toggle') {
           el.innerHTML = this._renderLabel(group);
         }
         el.innerHTML += this._renderControl(group);
-        this.container.appendChild(el);
+        body.appendChild(el);
         this._bindEvents(el, group);
       }
+
+      if (sec.title === 'Advanced') {
+        const preview = document.createElement('div');
+        preview.className = 'cli-preview-wrap';
+        preview.innerHTML = `
+          <div class="cli-preview-label">Command line preview</div>
+          <pre class="cli-preview"></pre>`;
+        body.appendChild(preview);
+      }
     }
+    this._updateCliPreview();
   },
 
   _renderLabel(group) {
@@ -413,6 +441,7 @@ const OptionsPanel = {
         el.querySelector('select').addEventListener('change', e => {
           this.state[group.id] = e.target.value;
           this._onGroupChange(group.id);
+          this._updateCliPreview();
         });
         break;
       case 'checkboxGroup':
@@ -428,12 +457,14 @@ const OptionsPanel = {
             }
             this.state[group.id] = arr;
             this._onCheckboxChange(group.id, val, e.target.checked);
+            this._updateCliPreview();
           });
         });
         break;
       case 'toggle':
         el.querySelector('input[type="checkbox"]').addEventListener('change', e => {
           this.state[group.id] = e.target.checked;
+          this._updateCliPreview();
         });
         break;
       case 'number': {
@@ -441,16 +472,17 @@ const OptionsPanel = {
         const clamp = () => {
           if (inp.value === '' && group.default === '') {
             this.state[group.id] = '';
-            return;
+          } else {
+            let v = parseInt(inp.value, 10);
+            if (isNaN(v)) v = group.default === '' ? '' : group.default;
+            else {
+              if (group.min != null) v = Math.max(v, group.min);
+              if (group.max != null) v = Math.min(v, group.max);
+            }
+            inp.value = v;
+            this.state[group.id] = v;
           }
-          let v = parseInt(inp.value, 10);
-          if (isNaN(v)) v = group.default === '' ? '' : group.default;
-          else {
-            if (group.min != null) v = Math.max(v, group.min);
-            if (group.max != null) v = Math.min(v, group.max);
-          }
-          inp.value = v;
-          this.state[group.id] = v;
+          this._updateCliPreview();
         };
         inp.addEventListener('change', clamp);
         inp.addEventListener('blur', clamp);
@@ -459,6 +491,7 @@ const OptionsPanel = {
       case 'text':
         el.querySelector('input').addEventListener('change', e => {
           this.state[group.id] = e.target.value.trim() || group.default;
+          this._updateCliPreview();
         });
         break;
     }
@@ -530,6 +563,7 @@ const OptionsPanel = {
     el.innerHTML = labelHtml + this._renderControl(group);
     this._bindEvents(el, group);
     this._initTooltips();
+    this._updateCliPreview();
   },
 
   _fullRerender() {
@@ -544,6 +578,13 @@ const OptionsPanel = {
       }
     }
     return null;
+  },
+
+  _updateCliPreview() {
+    const el = this.container && this.container.querySelector('.cli-preview');
+    if (!el) return;
+    const args = this.getCliArgs();
+    el.textContent = 'tri ' + args.join(' ') + (args.length ? ' ' : '') + 'program.c';
   },
 
   getCliArgs() {
@@ -579,6 +620,57 @@ const OptionsPanel = {
       }
     }
     return args;
+  },
+
+  cliArgsToState(args) {
+    const state = {};
+    for (const sec of this.sections) {
+      for (const g of sec.groups) {
+        state[g.id] = JSON.parse(JSON.stringify(g.default));
+      }
+    }
+    for (const arg of args) {
+      this._matchArgToState(arg, state);
+    }
+    return state;
+  },
+
+  _matchArgToState(arg, state) {
+    for (const sec of this.sections) {
+      for (const group of sec.groups) {
+        switch (group.type) {
+          case 'select': {
+            const opt = group.options.find(o => o.cliArg === arg);
+            if (opt) { state[group.id] = opt.value; return; }
+            break;
+          }
+          case 'checkboxGroup': {
+            const opt = group.options.find(o => o.cliArg === arg);
+            if (opt) {
+              if (!state[group.id].includes(opt.value)) state[group.id].push(opt.value);
+              return;
+            }
+            break;
+          }
+          case 'toggle':
+            if (group.cliArg === arg) { state[group.id] = true; return; }
+            break;
+          case 'number':
+            if (group.cliArgPrefix && arg.startsWith(group.cliArgPrefix)) {
+              const v = parseInt(arg.slice(group.cliArgPrefix.length), 10);
+              if (!isNaN(v)) state[group.id] = v;
+              return;
+            }
+            break;
+          case 'text':
+            if (group.cliArgPrefix && arg.startsWith(group.cliArgPrefix)) {
+              state[group.id] = arg.slice(group.cliArgPrefix.length);
+              return;
+            }
+            break;
+        }
+      }
+    }
   },
 
   getState() { return JSON.parse(JSON.stringify(this.state)); },

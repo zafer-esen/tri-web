@@ -1,5 +1,5 @@
-// Build a simple doubly-linked list with two nodes.
-// Result: SAFE
+// TRICERA-OPTIONS: -cex
+// Build a doubly-linked list with two nodes and check they are distinct.
 
 struct node {
   struct node *L;
@@ -18,6 +18,5 @@ void main() {
   tail->R = n;
   tail = n;
 
-  // The list has two distinct nodes
   assert(list != tail);
 }
