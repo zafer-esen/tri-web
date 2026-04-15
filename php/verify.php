@@ -62,10 +62,10 @@ $wantsGraphs = in_array('-pDot', $safeArgs) || in_array('-dotCEX', $safeArgs);
 
 $escapedArgs = array_map('escapeshellarg', $safeArgs);
 $triPpPath = dirname($TRICERA_PATH);
-$cmd = sprintf(
-    'cd %s && TRI_PP_PATH=%s DISPLAY= nice -n %d timeout --signal=KILL %d prlimit --data=%d %s %s %s 2>&1',
-    escapeshellarg($workDir),
-    escapeshellarg($triPpPath),
+
+// The tri invocation with resource limits (to be exec'd by a wrapper shell)
+$triInvocation = sprintf(
+    'nice -n %d timeout --signal=KILL %d prlimit --data=%d %s %s %s 2>&1',
     $NICE_LEVEL,
     $HARD_TIMEOUT,
     $MEM_LIMIT_MB * 1024 * 1024,
@@ -74,9 +74,31 @@ $cmd = sprintf(
     escapeshellarg($tmpFile)
 );
 
+// Wrap in setsid so the whole process tree is in one process group we can kill.
+// The wrapper shell writes its PID (which is the session/group leader) to a
+// file keyed by requestId, then execs the tri invocation.
+$requestId = $input['requestId'] ?? '';
+$requestId = preg_replace('/[^a-zA-Z0-9_-]/', '', $requestId);
+$pidFile = null;
+if ($requestId !== '') {
+    if (!is_dir($PID_DIR)) @mkdir($PID_DIR, 0700, true);
+    $pidFile = "$PID_DIR/$requestId.pid";
+}
+
+$parts = ['cd ' . escapeshellarg($workDir)];
+if ($pidFile !== null) {
+    $parts[] = 'echo $$ > ' . escapeshellarg($pidFile);
+}
+$parts[] = sprintf('TRI_PP_PATH=%s DISPLAY= exec %s',
+    escapeshellarg($triPpPath), $triInvocation);
+$wrapper = implode(' && ', $parts);
+$cmd = 'setsid sh -c ' . escapeshellarg($wrapper);
+
 $startTime = microtime(true);
 exec($cmd, $outputLines, $exitCode);
 $elapsed = round((microtime(true) - $startTime) * 1000);
+
+if ($pidFile !== null) @unlink($pidFile);
 
 $rawOutput = implode("\n", $outputLines);
 $result = parseTriceraOutput($rawOutput, $safeArgs);

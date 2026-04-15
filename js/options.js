@@ -3,39 +3,6 @@ const MEMSAFETY_SUBS = ['valid-deref', 'valid-free', 'valid-memtrack', 'valid-me
 const OptionsPanel = {
   sections: [
     {
-      title: 'Properties to check',
-      groups: [
-        {
-          id: 'properties',
-          type: 'checkboxGroup',
-          options: [
-            { value: 'reachsafety', label: 'Reachability safety', cliArg: '-reachsafety',
-              help: 'Check assert() statements and unreachability of reach_error().' },
-            { value: 'memsafety', label: 'Memory safety (all)', cliArg: '-memsafety',
-              help: 'Check all memory safety properties (selects all sub-options below).' },
-            { value: 'valid-deref', label: 'Valid pointer dereferences', cliArg: '-valid-deref', indent: true,
-              help: 'Check that pointer dereferences and array accesses are within bounds.' },
-            { value: 'valid-free', label: 'Valid free (no double-free)', cliArg: '-valid-free', indent: true,
-              help: 'Check that all free() calls are valid.' },
-            { value: 'valid-memtrack', label: 'Valid memory tracking (no leaks)', cliArg: '-valid-memtrack', indent: true,
-              help: 'Check that all allocated memory is tracked during execution.' },
-            { value: 'valid-memcleanup', label: 'Memory cleanup (freed at exit)', cliArg: '-valid-memcleanup', indent: true,
-              help: 'Check that all allocated memory is freed before program exit.' },
-          ],
-          default: [],
-          help: 'When none selected, reachability safety (assert statements) is checked by default.',
-        },
-        {
-          id: 'splitProperties',
-          label: 'Check properties separately',
-          type: 'toggle',
-          cliArg: '-splitProperties',
-          default: false,
-          help: 'Verify each property independently rather than all at once. Can make individual verification tasks easier.',
-        },
-      ],
-    },
-    {
       title: 'Basic settings',
       groups: [
         {
@@ -95,7 +62,7 @@ const OptionsPanel = {
             { value: 'cex', label: 'Textual', cliArg: '-cex',
               help: 'Display a step-by-step textual counterexample trace.' },
             { value: 'dotCEX', label: 'Graphical diagram', cliArg: '-dotCEX',
-              help: 'Generate a graphical counterexample diagram.' },
+              help: 'Generate a graphical counterexample diagram. Not supported for concurrent programs (use the textual option for those).' },
           ],
           default: ['cex'],
         },
@@ -163,6 +130,35 @@ const OptionsPanel = {
       collapsible: true,
       collapsed: true,
       groups: [
+        {
+          id: 'properties',
+          label: 'Properties to check',
+          type: 'checkboxGroup',
+          options: [
+            { value: 'reachsafety', label: 'Reachability safety', cliArg: '-reachsafety',
+              help: 'Check unreachability of unreach-call functions (e.g. reach_error()). User assert() statements are always checked regardless of this option.' },
+            { value: 'memsafety', label: 'Memory safety (all)', cliArg: '-memsafety',
+              help: 'Check all memory safety properties (selects all sub-options below).' },
+            { value: 'valid-deref', label: 'Valid pointer dereferences', cliArg: '-valid-deref', indent: true,
+              help: 'Check that pointer dereferences and array accesses are within bounds.' },
+            { value: 'valid-free', label: 'Valid free (no double-free)', cliArg: '-valid-free', indent: true,
+              help: 'Check that all free() calls are valid.' },
+            { value: 'valid-memtrack', label: 'Valid memory tracking (no leaks)', cliArg: '-valid-memtrack', indent: true,
+              help: 'Check that all allocated memory is tracked during execution.' },
+            { value: 'valid-memcleanup', label: 'Memory cleanup (freed at exit)', cliArg: '-valid-memcleanup', indent: true,
+              help: 'Check that all allocated memory is freed before program exit.' },
+          ],
+          default: ['reachsafety', 'valid-deref'],
+          help: 'Which program properties TriCera should verify.',
+        },
+        {
+          id: 'splitProperties',
+          label: 'Check properties separately',
+          type: 'toggle',
+          cliArg: '-splitProperties',
+          default: false,
+          help: 'Verify each property independently rather than all at once. Can make individual verification tasks easier.',
+        },
         {
           id: 'backend',
           label: 'Backend',
@@ -404,10 +400,8 @@ const OptionsPanel = {
     if (group.id !== 'properties') return items;
     const arr = this.state[group.id] || [];
     const noneSelected = !arr.length;
-    const hasMemButNoReach = arr.some(v => MEMSAFETY_SUBS.includes(v) || v === 'memsafety')
-      && !arr.includes('reachsafety');
-    const hint = `<div class="option-hint" style="display:${noneSelected ? 'block' : 'none'}">Default: checking reachability safety (assert statements)</div>`;
-    const warn = `<div class="option-warning" style="display:${hasMemButNoReach ? 'block' : 'none'}">Note: assert statements in the program are not being checked. Select reachability safety to check them.</div>`;
+    const hint = `<div class="option-hint" style="display:${noneSelected ? 'block' : 'none'}">No properties selected: reachability safety will be used as the default.</div>`;
+    const warn = `<div class="option-warning" style="display:${!noneSelected && !arr.includes('reachsafety') ? 'block' : 'none'}">Note: reach_error() calls are not being checked without Reachability safety.</div>`;
     return items + hint + warn;
   },
 

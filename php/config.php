@@ -9,6 +9,7 @@ $HARD_TIMEOUT = 65;         // hard kill (slightly above MAX_TIMEOUT for cleanup
 $MAX_CODE_SIZE = 50000;     // bytes
 $SHARE_DIR = __DIR__ . '/../shares';
 $LOG_DIR = __DIR__ . '/../log';
+$PID_DIR = sys_get_temp_dir() . '/tricera-web-pids';
 $MAX_LOG_SIZE_MB = 50;      // rotate log when it exceeds this size
 $NICE_LEVEL = 19;           // lowest priority
 $MEM_LIMIT_MB = 2048;       // heap data limit for TriCera process (--data, not --as)
