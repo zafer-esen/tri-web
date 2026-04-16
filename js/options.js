@@ -126,13 +126,10 @@ const OptionsPanel = {
       ],
     },
     {
-      title: 'Advanced',
-      collapsible: true,
-      collapsed: true,
+      title: 'Properties to check',
       groups: [
         {
           id: 'properties',
-          label: 'Properties to check',
           type: 'checkboxGroup',
           options: [
             { value: 'reachsafety', label: 'Reachability safety', cliArg: '-reachsafety',
@@ -159,6 +156,13 @@ const OptionsPanel = {
           default: false,
           help: 'Verify each property independently rather than all at once. Can make individual verification tasks easier.',
         },
+      ],
+    },
+    {
+      title: 'Advanced',
+      collapsible: true,
+      collapsed: true,
+      groups: [
         {
           id: 'backend',
           label: 'Backend',
