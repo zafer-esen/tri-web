@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -valid-deref -arithMode:ilp32
+// TRICERA-OPTIONS: -valid-deref
 #include <stdlib.h>
 
 int arr[10];

@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -m:foo -cex -memsafety -arithMode:ilp32
+// TRICERA-OPTIONS: -m:foo -cex -memsafety
 /*@
   requires \valid(p);
   ensures \result == *p;

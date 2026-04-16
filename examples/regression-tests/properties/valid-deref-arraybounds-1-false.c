@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -valid-deref -arithMode:ilp32
+// TRICERA-OPTIONS: -valid-deref
 void main() {
     int arr[3] = {1, 2, 3};
     arr[-1] = 42;

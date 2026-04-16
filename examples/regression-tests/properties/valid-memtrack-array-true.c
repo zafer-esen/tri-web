@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -valid-memtrack -arithMode:ilp32
+// TRICERA-OPTIONS: -valid-memtrack
 #include <stdlib.h>
 
 void* allocArray(int n) {

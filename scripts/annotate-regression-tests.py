@@ -64,18 +64,13 @@ PROPERTY_FILE_FLAGS = {
     'unreach-call':      [],
 }
 
-DATA_MODEL_FLAGS = {
-    'ILP32': '-arithMode:ilp32',
-    'LP64':  '-arithMode:lp64',
-    'LLP64': '-arithMode:llp64',
-}
-
-
 def parse_yml_flags(yml_path):
     """Extract TriCera flags from a .yml task definition file.
 
-    Handles `subproperty:` (specific memsafety sub-options), `property_file:`
-    references, and `data_model:` arithmetic mode.
+    Handles `subproperty:` (specific memsafety sub-options) and `property_file:`
+    references. The `data_model` field is SV-COMP metadata and is NOT mapped to
+    TriCera flags; only per-directory defaults (from runalldirs) determine the
+    arithmetic mode.
     """
     flags = []
     try:
@@ -103,12 +98,6 @@ def parse_yml_flags(yml_path):
                 for f in PROPERTY_FILE_FLAGS.get(name, []):
                     if f not in flags:
                         flags.append(f)
-
-    dm_match = re.search(r'data_model:\s*(\S+)', content)
-    if dm_match:
-        dm = dm_match.group(1).strip()
-        if dm in DATA_MODEL_FLAGS and DATA_MODEL_FLAGS[dm] not in flags:
-            flags.append(DATA_MODEL_FLAGS[dm])
 
     return flags
 

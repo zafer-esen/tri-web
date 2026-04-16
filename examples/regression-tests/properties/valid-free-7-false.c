@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -valid-free -arithMode:ilp32
+// TRICERA-OPTIONS: -valid-free
 #include <stdlib.h>
 
 void main() {

@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -valid-memcleanup -arithMode:ilp32
+// TRICERA-OPTIONS: -valid-memcleanup
 #include <stdlib.h>
 
 int* allocArray(int n) {

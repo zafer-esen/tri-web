@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -cex -heapModel:native -valid-deref -arithMode:ilp32
+// TRICERA-OPTIONS: -cex -heapModel:native -valid-deref
 void main() {
   int *a = malloc(sizeof(int));
   free(a);

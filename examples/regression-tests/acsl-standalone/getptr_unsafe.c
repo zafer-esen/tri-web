@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -m:foo -cex -valid-deref -arithMode:ilp32
+// TRICERA-OPTIONS: -m:foo -cex -valid-deref
 /*@
   ensures \result == *p;
 */

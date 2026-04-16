@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -cex -heapModel:native -memsafety -arithMode:ilp32
+// TRICERA-OPTIONS: -cex -heapModel:native -memsafety
 int nondet();
 
 void main() {

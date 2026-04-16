@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -cex -heapModel:native -valid-deref -arithMode:ilp32
+// TRICERA-OPTIONS: -cex -heapModel:native -valid-deref
 int nondet();
 
 void main() {

@@ -1,4 +1,4 @@
-// TRICERA-OPTIONS: -valid-deref -arithMode:ilp32
+// TRICERA-OPTIONS: -valid-deref
 void main() {
     int *p = 0;
     *p = 42;
