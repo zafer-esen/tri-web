@@ -114,7 +114,7 @@ $bgParts[] = sprintf(
     escapeshellarg($doneFile)
 );
 $wrapper = implode(' && ', $bgParts);
-$bgCmd = 'setsid sh -c ' . escapeshellarg($wrapper) . ' &';
+$bgCmd = 'setsid sh -c ' . escapeshellarg($wrapper) . ' > /dev/null 2>&1 &';
 
 // Launch in background (returns immediately)
 exec($bgCmd);
