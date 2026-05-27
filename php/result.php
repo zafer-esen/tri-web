@@ -34,7 +34,8 @@ $wantsGraphs = $meta['wantsGraphs'] ?? false;
 $workDir = $meta['workDir'] ?? '';
 $code = $meta['code'] ?? '';
 $startTime = $meta['startTime'] ?? microtime(true);
-$elapsed = round((filemtime($doneFile) - $startTime) * 1000);
+clearstatcache(true, $doneFile);
+$elapsed = max(0, round((filemtime($doneFile) - (int)$startTime) * 1000));
 
 $exitCode = (int)trim(file_get_contents($doneFile));
 if ($exitCode === 137) {
