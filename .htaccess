@@ -2,6 +2,7 @@ RewriteEngine On
 
 # Route API calls to PHP backend
 RewriteRule ^api/verify$ php/verify.php [L]
+RewriteRule ^api/result$ php/result.php [QSA,L]
 RewriteRule ^api/abort$ php/abort.php [L]
 RewriteRule ^api/share$ php/share.php [L]
 RewriteRule ^api/load$ php/load.php [QSA,L]

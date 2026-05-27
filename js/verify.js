@@ -1,6 +1,7 @@
 const Verifier = {
   running: false,
   currentRequestId: null,
+  pollTimer: null,
 
   async verify() {
     if (this.running) return;
@@ -28,23 +29,72 @@ const Verifier = {
         body: JSON.stringify({ code, args, requestId }),
       });
       if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
-      this.handleResult(await resp.json());
+
+      const result = await this._pollForResult(requestId);
+      this.handleResult(result);
     } catch (err) {
-      this.handleError(err);
+      if (err.name !== 'AbortError') {
+        this.handleError(err);
+      }
     } finally {
       this.running = false;
       this.currentRequestId = null;
+      this.pollTimer = null;
       this.setUIState('idle');
     }
   },
 
+  _pollForResult(requestId) {
+    const POLL_INTERVAL = 1000;
+    const MAX_POLL_TIME = 310000;
+    const startTime = Date.now();
+
+    return new Promise((resolve, reject) => {
+      const poll = async () => {
+        if (this.currentRequestId !== requestId) {
+          reject(new DOMException('Aborted', 'AbortError'));
+          return;
+        }
+
+        if (Date.now() - startTime > MAX_POLL_TIME) {
+          reject(new Error('Polling timed out waiting for verification result'));
+          return;
+        }
+
+        try {
+          const resp = await fetch(`api/result?id=${encodeURIComponent(requestId)}`);
+          if (!resp.ok && resp.status !== 404) {
+            throw new Error(`Server error: ${resp.status}`);
+          }
+          const data = await resp.json();
+
+          if (data.status === 'running' || data.status === 'not_found') {
+            this.pollTimer = setTimeout(poll, POLL_INTERVAL);
+          } else {
+            resolve(data);
+          }
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      this.pollTimer = setTimeout(poll, POLL_INTERVAL);
+    });
+  },
+
   async abort() {
     if (!this.running || !this.currentRequestId) return;
+    const id = this.currentRequestId;
+    this.currentRequestId = null;
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = null;
+    }
     try {
       await fetch('api/abort', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId: this.currentRequestId }),
+        body: JSON.stringify({ requestId: id }),
       });
     } catch (err) {
       console.error('Abort failed:', err);

@@ -30,6 +30,12 @@ MAX_LOG_SIZE_MB = 50
 RUNNING_PROCS = {}
 RUNNING_PROCS_LOCK = threading.Lock()
 
+COMPLETED_RESULTS = {}
+COMPLETED_RESULTS_LOCK = threading.Lock()
+PENDING_REQUESTS = set()
+PENDING_REQUESTS_LOCK = threading.Lock()
+RESULT_TTL = 300
+
 ALLOWED_ARG_PATTERN = re.compile(
     r'^-(?:arithMode:[a-z0-9]+|t:\d+(\.\d+)?|m:\w+|heapModel:[a-z]+|log:\d+'
     r'|cex|acsl|f|printPP|p|pDot|dotCEX|pngNo|sp'
@@ -374,6 +380,29 @@ def run_tricera(code, args, request_id=None):
         shutil.rmtree(workdir, ignore_errors=True)
 
 
+def _run_tricera_background(code, args, request_id, remote_addr):
+    result = run_tricera(code, args, request_id=request_id)
+    log_submission(remote_addr, code, args,
+                   result.get('status', '?'), result.get('elapsedMs', 0))
+    with COMPLETED_RESULTS_LOCK:
+        COMPLETED_RESULTS[request_id] = {
+            'result': result,
+            'completed_at': time.time(),
+        }
+    with PENDING_REQUESTS_LOCK:
+        PENDING_REQUESTS.discard(request_id)
+    _cleanup_old_results()
+
+
+def _cleanup_old_results():
+    now = time.time()
+    with COMPLETED_RESULTS_LOCK:
+        expired = [rid for rid, entry in COMPLETED_RESULTS.items()
+                   if now - entry['completed_at'] > RESULT_TTL]
+        for rid in expired:
+            del COMPLETED_RESULTS[rid]
+
+
 class TriceraHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         path = urlparse(self.path).path
@@ -394,6 +423,8 @@ class TriceraHandler(SimpleHTTPRequestHandler):
             self.send_response(204)
             self.end_headers()
             return
+        elif path == '/api/result':
+            self.handle_result()
         elif path == '/api/load':
             self.handle_load()
         elif path == '/api/config':
@@ -409,11 +440,20 @@ class TriceraHandler(SimpleHTTPRequestHandler):
 
         args = body.get('args', [])
         request_id = body.get('requestId')
-        result = run_tricera(body['code'], args, request_id=request_id)
+        if not request_id:
+            self.send_json({'status': 'ERROR', 'message': 'No requestId provided'}, 400)
+            return
+
         remote_addr = self.client_address[0]
-        log_submission(remote_addr, body['code'], args,
-                       result.get('status', '?'), result.get('elapsedMs', 0))
-        self.send_json(result)
+        with PENDING_REQUESTS_LOCK:
+            PENDING_REQUESTS.add(request_id)
+        thread = threading.Thread(
+            target=_run_tricera_background,
+            args=(body['code'], args, request_id, remote_addr),
+            daemon=True,
+        )
+        thread.start()
+        self.send_json({'requestId': request_id, 'status': 'running'})
 
     def handle_abort(self):
         body = self.read_json()
@@ -433,6 +473,33 @@ class TriceraHandler(SimpleHTTPRequestHandler):
             self.send_json({'aborted': False, 'message': 'Process already finished'})
         except Exception as e:
             self.send_json({'aborted': False, 'message': str(e)}, 500)
+
+    def handle_result(self):
+        qs = parse_qs(urlparse(self.path).query)
+        request_id = qs.get('id', [''])[0]
+        if not request_id:
+            self.send_json({'error': 'No request ID provided'}, 400)
+            return
+
+        with COMPLETED_RESULTS_LOCK:
+            entry = COMPLETED_RESULTS.pop(request_id, None)
+        if entry:
+            self.send_json(entry['result'])
+            return
+
+        with RUNNING_PROCS_LOCK:
+            is_running = request_id in RUNNING_PROCS
+        if is_running:
+            self.send_json({'status': 'running'})
+            return
+
+        with PENDING_REQUESTS_LOCK:
+            is_pending = request_id in PENDING_REQUESTS
+        if is_pending:
+            self.send_json({'status': 'running'})
+            return
+
+        self.send_json({'status': 'not_found', 'message': 'No result for this request ID'}, 404)
 
     def handle_config(self):
         self.send_json({
