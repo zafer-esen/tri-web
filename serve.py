@@ -391,7 +391,7 @@ def run_tricera(code, args, request_id=None):
     hard_timeout = job_timeout(safe_args)
     env = tricera_environment()
     if any(a in safe_args for a in ('-cpp', '-cppLight')) and not shutil.which('cc', path=env['PATH']):
-        return terminal_result('ERROR', "C preprocessing requires 'cc'. Install a C compiler or set TRICERA_TOOL_PATH to its executable search path.")
+        return terminal_result('ERROR', "C preprocessing cannot find an executable 'cc' in the web server's PATH. Check the compiler installation and TRICERA_TOOL_PATH.")
 
     ext = '.hcc' if any(kw in code for kw in ['thread ', 'thread[', 'atomic ', 'atomic{', 'chan ']) else '.c'
 

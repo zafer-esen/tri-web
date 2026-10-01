@@ -39,7 +39,7 @@ $safeArgs = validateArgs($requestedArgs);
 // Compute before the internal -t:0 used for preprocessor output.
 $hardTimeout = jobTimeout($safeArgs);
 if ((in_array('-cpp', $safeArgs) || in_array('-cppLight', $safeArgs)) && !findTool('cc')) {
-    echo json_encode(terminalResult('ERROR', "C preprocessing requires 'cc'. Install a C compiler or set TRICERA_TOOL_PATH to its executable search path."));
+    echo json_encode(terminalResult('ERROR', "C preprocessing cannot find an executable 'cc' in the web server's PATH. Check the compiler installation and TRICERA_TOOL_PATH."));
     exit;
 }
 

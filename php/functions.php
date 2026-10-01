@@ -8,7 +8,7 @@ function configureToolEnvironment() {
     putenv('DISPLAY=');
     $configured = getenv('TRI_PP_PATH');
     if ($configured === false || $configured === '') {
-        $triDir = dirname(realpath($TRICERA_PATH) ?: $TRICERA_PATH);
+        $triDir = dirname(@realpath($TRICERA_PATH) ?: $TRICERA_PATH);
         $directories = [$triDir . '/dist', $triDir];
         $onPath = findTool('tri-pp');
         if ($onPath) $directories[] = dirname($onPath);
@@ -17,7 +17,7 @@ function configureToolEnvironment() {
         $directories[] = $checkout . '/build';
         foreach ($directories as $directory) {
             $executable = $directory . '/tri-pp';
-            if (is_file($executable) && is_executable($executable)) {
+            if (@is_file($executable) && @is_executable($executable)) {
                 putenv('TRI_PP_PATH=' . realpath($directory));
                 break;
             }
@@ -26,11 +26,8 @@ function configureToolEnvironment() {
 }
 
 function findTool($name) {
-    foreach (explode(PATH_SEPARATOR, getenv('PATH') ?: '') as $directory) {
-        $path = $directory . '/' . $name;
-        if ($directory !== '' && is_file($path) && is_executable($path)) return $path;
-    }
-    return null;
+    exec('command -v ' . escapeshellarg($name) . ' 2>/dev/null', $output, $exitCode);
+    return $exitCode === 0 && $output ? $output[0] : null;
 }
 
 function parseInvariantEncodings($helpOutput) {

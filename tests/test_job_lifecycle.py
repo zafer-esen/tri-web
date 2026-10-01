@@ -40,6 +40,8 @@ if mode == 'hang':
     time.sleep(60)
 elif mode == 'env':
     print(json.dumps({'pp': os.environ.get('TRI_PP_PATH'), 'path': os.environ.get('PATH')}))
+elif mode == 'compiler':
+    subprocess.run(['cc', '--version'], check=True)
 elif mode == 'error':
     print('Other Error: compiler failed')
     sys.exit(1)
@@ -250,6 +252,30 @@ eval('?>' . $source);
                     actual = json.loads(result['rawOutput'].splitlines()[0])
                     self.assertEqual(actual['pp'], pp)
                     self.assertIn('/usr/bin', actual['path'].split(':'))
+
+    def test_php_finds_compiler_outside_open_basedir(self):
+        if not self.php:
+            self.skipTest('PHP CLI is required for PHP backend tests')
+        with tempfile.TemporaryDirectory(prefix='tricera-web-compiler-') as directory:
+            compiler = Path(directory) / 'cc'
+            compiler.write_text('#!/bin/sh\necho compiler-ran\n')
+            compiler.chmod(0o755)
+            self.php_options = ['-d', 'open_basedir=' + str(self.work),
+                                '-d', 'sys_temp_dir=' + str(self.work)]
+            probe = subprocess.run(
+                [self.php] + self.php_options + ['-r',
+                 'echo json_encode(@is_file($argv[1]) && @is_executable($argv[1]));',
+                 str(compiler)], capture_output=True, text=True, check=True)
+            self.assertEqual(probe.stdout, 'false')
+            env = dict(os.environ, PATH=directory)
+            env.pop('TRICERA_TOOL_PATH', None)
+            env.pop('TRI_PP_PATH', None)
+            for option in ('-cpp', '-cppLight'):
+                with self.subTest(option=option):
+                    rid, _, _ = self.start('php', 'compiler', ['-t:2', option], env)
+                    result = self.wait_result('php', rid)
+                    self.assertEqual(result['status'], 'SAFE', result)
+                    self.assertIn('compiler-ran', result['rawOutput'])
 
     def test_argument_validation_includes_invariant_and_clamps_decimals(self):
         encodings = ['R', 'R-opt', 'R-tag', 'R-tag-opt', 'RW', 'RW-fun', 'RW-fun-opt',
