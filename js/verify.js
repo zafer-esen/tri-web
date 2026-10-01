@@ -2,6 +2,8 @@ const Verifier = {
   running: false,
   currentRequestId: null,
   pollTimer: null,
+  submission: null,
+  aborting: false,
 
   async verify() {
     if (this.running) return;
@@ -22,82 +24,101 @@ const Verifier = {
     this.setUIState('verifying');
 
     try {
+      const validationError = OptionsPanel.getValidationError();
+      if (validationError) {
+        this.handleResult({ status: 'ERROR', message: validationError });
+        return;
+      }
       const args = OptionsPanel.getCliArgs();
-      const resp = await fetch('api/verify', {
+      this.submission = this._fetchJSON('api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, args, requestId }),
       });
-      if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
+      const initial = await this.submission;
+      if (initial.status !== 'running') {
+        this.handleResult(initial);
+        return;
+      }
 
-      const result = await this._pollForResult(requestId);
+      const maxPollTime = initial.timeoutSeconds ? initial.timeoutSeconds * 1000 + 15000 : 310000;
+      const result = await this._pollForResult(requestId, maxPollTime);
       this.handleResult(result);
     } catch (err) {
-      if (err.name !== 'AbortError') {
-        this.handleError(err);
-      }
+      this.handleError(err);
     } finally {
       this.running = false;
       this.currentRequestId = null;
       this.pollTimer = null;
-      this.setUIState('idle');
+      this.submission = null;
+      this.aborting = false;
     }
   },
 
-  _pollForResult(requestId) {
-    const POLL_INTERVAL = 1000;
-    const MAX_POLL_TIME = 310000;
+  async _pollForResult(requestId, maxPollTime = 310000) {
     const startTime = Date.now();
+    while (true) {
+      await this._waitForPoll();
+      const remaining = maxPollTime - (Date.now() - startTime);
+      if (remaining <= 0) throw new Error('Polling timed out waiting for verification result');
+      const data = await this._fetchJSON(`api/result?id=${encodeURIComponent(requestId)}`, {}, Math.min(10000, remaining));
+      if (data.status === 'not_found' && Date.now() - startTime > 5000) {
+        throw new Error('Verification result was not found on the server');
+      }
+      if (data.status !== 'running' && data.status !== 'not_found') return data;
+    }
+  },
 
-    return new Promise((resolve, reject) => {
-      const poll = async () => {
-        if (this.currentRequestId !== requestId) {
-          reject(new DOMException('Aborted', 'AbortError'));
-          return;
-        }
-
-        if (Date.now() - startTime > MAX_POLL_TIME) {
-          reject(new Error('Polling timed out waiting for verification result'));
-          return;
-        }
-
-        try {
-          const resp = await fetch(`api/result?id=${encodeURIComponent(requestId)}`);
-          if (!resp.ok && resp.status !== 404) {
-            throw new Error(`Server error: ${resp.status}`);
-          }
-          const data = await resp.json();
-
-          if (data.status === 'running' || data.status === 'not_found') {
-            this.pollTimer = setTimeout(poll, POLL_INTERVAL);
-          } else {
-            resolve(data);
-          }
-        } catch (err) {
-          reject(err);
-        }
-      };
-
-      this.pollTimer = setTimeout(poll, POLL_INTERVAL);
+  _waitForPoll() {
+    return new Promise(resolve => {
+      this.pollTimer = setTimeout(() => {
+        this.pollTimer = null;
+        resolve();
+      }, 1000);
     });
   },
 
-  async abort() {
-    if (!this.running || !this.currentRequestId) return;
-    const id = this.currentRequestId;
-    this.currentRequestId = null;
-    if (this.pollTimer) {
-      clearTimeout(this.pollTimer);
-      this.pollTimer = null;
-    }
+  async _fetchJSON(url, options = {}, timeoutMs = 10000) {
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
     try {
-      await fetch('api/abort', {
+      const resp = await fetch(url, { ...options, signal: controller.signal });
+      const data = await resp.json();
+      if (!resp.ok && data.status !== 'ERROR' && data.status !== 'not_found') {
+        throw new Error(data.message || `Server error: ${resp.status}`);
+      }
+      return data;
+    } catch (err) {
+      if (timedOut) throw new Error('Server request timed out');
+      throw err;
+    } finally {
+      clearTimeout(timer);
+    }
+  },
+
+  async abort() {
+    if (!this.running || !this.currentRequestId || this.aborting) return;
+    const id = this.currentRequestId;
+    this.aborting = true;
+    let accepted = false;
+    try {
+      // Wait for submission acknowledgement so an early Abort cannot miss the job.
+      const initial = await this.submission;
+      if (initial.status !== 'running' || this.currentRequestId !== id) return;
+      const result = await this._fetchJSON('api/abort', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ requestId: id }),
       });
+      accepted = result.aborted;
+      // Keep polling for the terminal response: PHP collects output, logs, and
+      // removes temporary source files when that response is retrieved.
     } catch (err) {
       console.error('Abort failed:', err);
+      // Keep polling; the server's deadline still applies if cancellation failed.
+    } finally {
+      if (!accepted && this.currentRequestId === id) this.aborting = false;
     }
   },
 

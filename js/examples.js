@@ -16,6 +16,11 @@ const ExamplesLoader = {
       ],
     },
     {
+      id: 'invariant-heap',
+      name: 'Invariant Heap Encodings',
+      examples: [],
+    },
+    {
       name: 'Memory Safety',
       examples: [
         { id: 'mem-deref', name: 'Null Dereference (UNSAFE)', file: 'mem-deref.c' },
@@ -58,7 +63,18 @@ const ExamplesLoader = {
     });
 
     this._loadRegressionTests();
+    this._loadArtifactExamples();
     this.render();
+  },
+
+  async _loadArtifactExamples() {
+    try {
+      const resp = await fetch('examples/invariant-heap.json');
+      if (!resp.ok) return;
+      const index = this.categories.findIndex(category => category.id === 'invariant-heap');
+      this.categories[index] = await resp.json();
+      this.render();
+    } catch (e) {}
   },
 
   async _loadRegressionTests() {
@@ -86,16 +102,7 @@ const ExamplesLoader = {
     this.panel.innerHTML = '';
 
     for (const cat of this.categories) {
-      const group = document.createElement('div');
-      group.className = 'examples-group';
-      const header = document.createElement('div');
-      header.className = 'examples-group-header';
-      header.textContent = cat.name;
-      group.appendChild(header);
-      for (const ex of cat.examples) {
-        group.appendChild(this._makeItem(ex));
-      }
-      this.panel.appendChild(group);
+      this.panel.appendChild(this._makeGroup(cat, 'examples/' + (cat.id || cat.name)));
     }
 
     if (this.regressionCategories.length) {
@@ -105,39 +112,46 @@ const ExamplesLoader = {
       this.panel.appendChild(sep);
 
       for (const cat of this.regressionCategories) {
-        const group = document.createElement('div');
-        group.className = 'examples-group collapsible';
-        const expanded = this.expandedCategories.has(cat.name);
-        if (expanded) group.classList.add('expanded');
-
-        const header = document.createElement('div');
-        header.className = 'examples-group-header collapsible';
-        header.innerHTML = `
-          <span class="examples-group-arrow">${expanded ? '\u25BE' : '\u25B8'}</span>
-          <span class="examples-group-name">${cat.name}</span>
-          <span class="examples-group-count">${cat.examples.length}</span>`;
-        header.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (this.expandedCategories.has(cat.name)) {
-            this.expandedCategories.delete(cat.name);
-          } else {
-            this.expandedCategories.add(cat.name);
-          }
-          this.render();
-        });
-        group.appendChild(header);
-
-        if (expanded) {
-          const items = document.createElement('div');
-          items.className = 'examples-group-items';
-          for (const ex of cat.examples) {
-            items.appendChild(this._makeItem(ex));
-          }
-          group.appendChild(items);
-        }
-        this.panel.appendChild(group);
+        this.panel.appendChild(this._makeGroup(cat, 'regression/' + cat.name));
       }
     }
+  },
+
+  _exampleCount(cat) {
+    return (cat.examples || []).length + (cat.categories || []).reduce(
+      (count, child) => count + this._exampleCount(child), 0);
+  },
+
+  _makeGroup(cat, key) {
+    const group = document.createElement('details');
+    group.className = 'examples-group';
+    group.open = this.expandedCategories.has(key);
+    const header = document.createElement('summary');
+    header.className = 'examples-group-header collapsible';
+    for (const [className, text] of [
+      ['examples-group-arrow', '\u25B8'],
+      ['examples-group-name', cat.name],
+      ['examples-group-count', this._exampleCount(cat)],
+    ]) {
+      const span = document.createElement('span');
+      span.className = className;
+      span.textContent = text;
+      header.appendChild(span);
+    }
+    group.appendChild(header);
+    group.addEventListener('toggle', () => {
+      if (group.open) this.expandedCategories.add(key);
+      else this.expandedCategories.delete(key);
+    });
+
+    const items = document.createElement('div');
+    items.className = 'examples-group-items';
+    for (const child of cat.categories || []) {
+      items.appendChild(this._makeGroup(child, key + '/' + (child.id || child.name)));
+    }
+    for (const ex of cat.examples || []) items.appendChild(this._makeItem(ex));
+    group.appendChild(items);
+    return group;
   },
 
   _makeItem(ex) {
@@ -162,8 +176,8 @@ const ExamplesLoader = {
 
       const firstLines = code.split('\n').slice(0, 5).join('\n');
       const m = firstLines.match(/\/\/\s*TRICERA-OPTIONS:\s*(.+)/);
-      if (m) {
-        const flags = m[1].trim().split(/\s+/);
+      const flags = example.args || (m && m[1].trim().split(/\s+/));
+      if (flags) {
         const state = OptionsPanel.cliArgsToState(flags);
         OptionsPanel.setState(state);
       } else {
@@ -182,16 +196,13 @@ const ExamplesLoader = {
     }
   },
 
-  findExample(id) {
-    for (const cat of this.categories) {
-      for (const ex of cat.examples) {
+  findExample(id, categories = [...this.categories, ...this.regressionCategories]) {
+    for (const cat of categories) {
+      for (const ex of cat.examples || []) {
         if (ex.id === id) return ex;
       }
-    }
-    for (const cat of this.regressionCategories) {
-      for (const ex of cat.examples) {
-        if (ex.id === id) return ex;
-      }
+      const nested = this.findExample(id, cat.categories || []);
+      if (nested) return nested;
     }
     return null;
   },

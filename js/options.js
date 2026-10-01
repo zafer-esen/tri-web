@@ -19,6 +19,18 @@ const OptionsPanel = {
           help: 'Integer semantics. Mathematical uses unbounded integers (default). ILP32/LP64/LLP64 model machine-specific integer sizes with overflow.',
         },
         {
+          id: 'heapModel',
+          label: 'Heap model',
+          type: 'select',
+          options: [
+            { value: 'native', label: 'Native (theory of heaps)', cliArg: '-heapModel:native' },
+            { value: 'array', label: 'Array', cliArg: '-heapModel:array' },
+            { value: 'invariant', label: 'Invariant', cliArg: null },
+          ],
+          default: 'native',
+          help: 'Memory model for heap operations. Invariant uses an invariant-based heap encoding and mathematical program arrays. It currently supports reachability only.',
+        },
+        {
           id: 'timeout',
           label: 'Timeout (seconds)',
           type: 'number',
@@ -26,7 +38,7 @@ const OptionsPanel = {
           default: 30,
           min: 1,
           max: 60,
-          help: 'Maximum verification time (up to 60 seconds).',
+          help: 'Verification time limit. The server also enforces this limit, with a short allowance for cleanup.',
         },
         {
           id: 'entryFunction',
@@ -260,15 +272,15 @@ const OptionsPanel = {
           help: 'How aggressively to split disjunctions in Horn clauses. Higher values may help with some programs but increase clause count.',
         },
         {
-          id: 'heapModel',
-          label: 'Heap model',
+          id: 'invariantEncoding',
+          label: 'Invariant encoding',
           type: 'select',
           options: [
-            { value: 'native', label: 'Native (theory of heaps)', cliArg: '-heapModel:native' },
-            { value: 'array', label: 'Array (experimental)', cliArg: '-heapModel:array' },
+            { value: 'default', label: 'Use TriCera default', cliArg: '-invEncoding' },
           ],
-          default: 'native',
-          help: 'Memory model for heap operations. Native uses a theory of heaps; array-based is experimental.',
+          default: 'default',
+          visible: () => OptionsPanel.state.heapModel === 'invariant',
+          help: 'Leave the choice to TriCera, or select a specific invariant encoding. The default is determined by the installed TriCera version.',
         },
         {
           id: 'programArrays',
@@ -279,6 +291,7 @@ const OptionsPanel = {
             { value: 'math', label: 'Mathematical', cliArg: '-mathArrays' },
           ],
           default: 'heap',
+          visible: () => OptionsPanel.state.heapModel !== 'invariant',
           help: 'How to model C arrays. Theory of heaps allocates arrays on the heap. Mathematical arrays are unbounded and skip memory safety checks on arrays.',
         },
         {
@@ -294,6 +307,7 @@ const OptionsPanel = {
   ],
 
   state: {},
+  invariantEncodingsLoaded: false,
 
   init(container) {
     this.container = container;
@@ -309,6 +323,7 @@ const OptionsPanel = {
         this.state[g.id] = JSON.parse(JSON.stringify(g.default));
       }
     }
+    this._normalizeTimeout(this.state);
   },
 
   render() {
@@ -382,10 +397,17 @@ const OptionsPanel = {
   },
 
   _renderSelect(group) {
-    const opts = group.options.map(o =>
+    let opts = group.options.map(o =>
       `<option value="${o.value}" ${this.state[group.id] === o.value ? 'selected' : ''}>${o.label}</option>`
     ).join('');
-    return `<select data-id="${group.id}">${opts}</select>`;
+    if (group.id === 'invariantEncoding' && !group.options.some(o => o.value === this.state[group.id])) {
+      const label = this.invariantEncodingsLoaded ? 'Saved encoding unavailable' : 'Loading saved encoding…';
+      opts = `<option value="" disabled selected>${label}</option>` + opts;
+    }
+    const error = group.id === 'heapModel' ? this.getValidationError() : null;
+    const hint = group.id === 'heapModel' && this.state.heapModel === 'invariant'
+      ? '<div class="option-hint">Program arrays use mathematical arrays with invariant encoding.</div>' : '';
+    return `<select data-id="${group.id}">${opts}</select>${hint}${error ? `<div class="option-warning">${error}</div>` : ''}`;
   },
 
   _renderCheckboxGroup(group) {
@@ -496,7 +518,7 @@ const OptionsPanel = {
   },
 
   _onGroupChange(groupId) {
-    if (groupId === 'backend' || groupId === 'abstract') {
+    if (groupId === 'backend' || groupId === 'abstract' || groupId === 'heapModel' || groupId === 'invariantEncoding') {
       this._fullRerender();
     }
   },
@@ -525,6 +547,7 @@ const OptionsPanel = {
       }
     }
     this._rerenderGroup('properties');
+    this._rerenderGroup('heapModel');
   },
 
   _applyAnnotationCouplings(value, checked) {
@@ -620,6 +643,46 @@ const OptionsPanel = {
     return args;
   },
 
+  getValidationError() {
+    if (this.state.heapModel === 'invariant' && !this._findGroup('invariantEncoding').options.some(
+      option => option.value === this.state.invariantEncoding)) {
+      return this.invariantEncodingsLoaded
+        ? 'The selected invariant encoding is unavailable. Select an encoding from the list or use the TriCera default.'
+        : 'Invariant encodings are still loading. Try again in a moment.';
+    }
+    if (this.state.heapModel === 'invariant' && (this.state.properties || []).some(
+      p => p === 'memsafety' || MEMSAFETY_SUBS.includes(p))) {
+      return 'Invariant encoding currently supports reachability only. Deselect the memory-safety properties to use it, or choose Native or Array.';
+    }
+    return null;
+  },
+
+  setInvariantEncodings(encodings) {
+    const names = [...new Set((Array.isArray(encodings) ? encodings : []).filter(
+      name => typeof name === 'string' && /^[A-Za-z0-9][A-Za-z0-9-]*$/.test(name) && name !== 'default'))];
+    this._findGroup('invariantEncoding').options = [
+      { value: 'default', label: 'Use TriCera default', cliArg: '-invEncoding' },
+      ...names.map(name => ({ value: name, label: name, cliArg: '-invEncoding:' + name })),
+    ];
+    this.invariantEncodingsLoaded = true;
+    this._fullRerender();
+  },
+
+  setMaxTimeout(maxTimeout) {
+    if (!Number.isFinite(maxTimeout) || maxTimeout < 1) return;
+    const group = this._findGroup('timeout');
+    group.max = maxTimeout;
+    group.default = Math.min(group.default, maxTimeout);
+    this._normalizeTimeout(this.state);
+    this._rerenderGroup('timeout');
+  },
+
+  _normalizeTimeout(state) {
+    const group = this._findGroup('timeout');
+    const value = Number.parseInt(state.timeout, 10);
+    state.timeout = Number.isFinite(value) ? Math.max(group.min, Math.min(group.max, value)) : group.default;
+  },
+
   cliArgsToState(args) {
     const state = {};
     for (const sec of this.sections) {
@@ -630,6 +693,18 @@ const OptionsPanel = {
     for (const arg of args) {
       this._matchArgToState(arg, state);
     }
+    const invariantArgs = args.filter(arg => arg === '-invEncoding' || arg.startsWith('-invEncoding:'));
+    if (invariantArgs.length) {
+      // Invariant takes precedence over native/array regardless of argument order.
+      state.heapModel = 'invariant';
+      const last = invariantArgs[invariantArgs.length - 1];
+      state.invariantEncoding = last === '-invEncoding' ? 'default' : last.slice('-invEncoding:'.length);
+      const properties = this._findGroup('properties').options
+        .filter(o => args.includes(o.cliArg)).map(o => o.value);
+      // Do not add the UI's default valid-deref to a reachability-only example.
+      state.properties = properties.length ? properties : ['reachsafety'];
+    }
+    this._normalizeTimeout(state);
     return state;
   },
 
@@ -674,9 +749,14 @@ const OptionsPanel = {
   getState() { return JSON.parse(JSON.stringify(this.state)); },
 
   setState(obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, 'heapModel') &&
+        !Object.prototype.hasOwnProperty.call(obj, 'invariantEncoding')) {
+      this.state.invariantEncoding = 'default';
+    }
     for (const key in obj) {
       if (this.state.hasOwnProperty(key)) this.state[key] = obj[key];
     }
+    this._normalizeTimeout(this.state);
     this._fullRerender();
   },
 

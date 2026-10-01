@@ -4,7 +4,8 @@ A web-based interface for [TriCera](https://github.com/uuverifiers/tricera), a C
 
 # Requirements
 
-* [TriCera](https://github.com/uuverifiers/tricera) installed and accessible via the `tri` script.
+* [TriCera](https://github.com/uuverifiers/tricera) installed and accessible via the `tri` script or native executable.
+* A C compiler providing `cc` for the Full (`-cpp`) and Light (`-cppLight`) preprocessing options.
 * For local use: Python 3.6+ (standard library only, no pip install needed).
 * For server deployment: Apache with PHP 7.4+ and `mod_rewrite`.
 * Optional: [Graphviz](https://graphviz.org/) (`dot` command) for graphical Horn clauses and counterexample diagrams.
@@ -27,16 +28,27 @@ python3 serve.py --tricera /path/to/tri
 
 The server auto-detects the `tri` executable by checking `TRICERA_PATH` environment variable, then `../tricera/tri` and `../tri` (if cloned alongside TriCera), then `tri` in PATH.
 
-Other options: `--port PORT`, `--host HOST`, `--server` (enables `nice`, `prlimit`, and strict timeout limits for production use).
+Other options: `--port PORT`, `--host HOST`, `--tool-path PATH`, `--server` (enables `nice`, `prlimit`, and strict timeout limits for production use).
 
 # Server deployment (Apache + PHP)
 
 1. Copy the project to your web root (e.g., `/var/www/html/tricera/`).
-2. Edit `php/config.php` and set `$TRICERA_PATH` to point to your `tri` executable.
+2. Create `php/config.local.php` and set `$TRICERA_PATH` to point to your `tri` script or native executable. This override file is gitignored.
 3. Create the `shares/` and `log/` directories, writable by the web server user.
 4. Enable `mod_rewrite` (`sudo a2enmod rewrite && sudo systemctl restart apache2`) and ensure `AllowOverride All` is set for the directory in your Apache config.
 
 The Python backend (`serve.py`) and the PHP backend (`php/`) implement the same API, so the frontend works identically with either.
+
+The PHP backend also requires the Linux `setsid`, `timeout`, `nice`, and `prlimit` utilities.
+
+If needed, set `TRI_PP_PATH` to the directory containing `tri-pp`. For other tools outside PATH, set `TRICERA_TOOL_PATH` or PHP's `$TOOL_PATH`.
+
+# Tests
+
+```bash
+python3 -m unittest discover -s tests -v
+node tests/frontend.test.js
+```
 
 # Sharing
 

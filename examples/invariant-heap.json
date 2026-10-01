@@ -1,0 +1,160 @@
+{
+  "id": "invariant-heap",
+  "name": "Invariant Heap Encodings",
+  "examples": [
+    {
+      "id": "inv-listing-safe",
+      "name": "List with a Terminal Value (SAFE)",
+      "file": "invariant-heap/listing-2-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-listing-unsafe",
+      "name": "List with a Terminal Value (UNSAFE)",
+      "file": "invariant-heap/listing-2-unsafe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-no-loop-1-safe",
+      "name": "sll-constant-no-loop-1 (SAFE)",
+      "file": "invariant-heap/sll-constant-no-loop-1-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-no-loop-1-unsafe",
+      "name": "sll-constant-no-loop-1 (UNSAFE)",
+      "file": "invariant-heap/sll-constant-no-loop-1-unsafe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-no-loop-no-struct-safe",
+      "name": "sll-constant-no-loop-no-struct (SAFE)",
+      "file": "invariant-heap/sll-constant-no-loop-no-struct-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-no-loop-no-struct-unsafe",
+      "name": "sll-constant-no-loop-no-struct (UNSAFE)",
+      "file": "invariant-heap/sll-constant-no-loop-no-struct-unsafe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-unbounded-1-safe",
+      "name": "sll-constant-unbounded-1 (SAFE)",
+      "file": "invariant-heap/sll-constant-unbounded-1-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-unbounded-1-unsafe",
+      "name": "sll-constant-unbounded-1 (UNSAFE)",
+      "file": "invariant-heap/sll-constant-unbounded-1-unsafe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-unbounded-2-safe",
+      "name": "sll-constant-unbounded-2 (SAFE)",
+      "file": "invariant-heap/sll-constant-unbounded-2-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-unbounded-3-safe",
+      "name": "sll-constant-unbounded-3 (SAFE)",
+      "file": "invariant-heap/sll-constant-unbounded-3-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-constant-unbounded-4-safe",
+      "name": "sll-constant-unbounded-4 (SAFE)",
+      "file": "invariant-heap/sll-constant-unbounded-4-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-bounded-safe",
+      "name": "List Values Bounded by N (SAFE)",
+      "file": "invariant-heap/sll-variable-unbounded-1-safe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-bounded-unsafe",
+      "name": "List Values Bounded by N (UNSAFE)",
+      "file": "invariant-heap/sll-variable-unbounded-1-unsafe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    },
+    {
+      "id": "inv-sll-variable-unbounded-2-unsafe",
+      "name": "sll-variable-unbounded-2 (UNSAFE)",
+      "file": "invariant-heap/sll-variable-unbounded-2-unsafe.c",
+      "args": [
+        "-invEncoding",
+        "-reachsafety",
+        "-cpp",
+        "-t:30"
+      ]
+    }
+  ]
+}

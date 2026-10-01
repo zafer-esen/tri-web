@@ -114,7 +114,8 @@ class TestVerifyTimeout(unittest.TestCase):
         cls.proxy_port = _free_port()
         cls.blocking_port = _free_port()
 
-        serve_py = os.path.join(os.path.dirname(__file__), '..', 'serve.py')
+        serve_py = os.path.join(cls.mock_dir, 'serve.py')
+        shutil.copyfile(os.path.join(os.path.dirname(__file__), '..', 'serve.py'), serve_py)
         cls.server_proc = subprocess.Popen(
             [sys.executable, serve_py,
              '--port', str(cls.server_port),

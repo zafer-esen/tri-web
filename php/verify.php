@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/functions.php';
+configureToolEnvironment();
 
 $input = json_decode(file_get_contents('php://input'), true);
 if (!$input || empty($input['code'])) {
@@ -34,16 +35,12 @@ if (strlen($code) > $MAX_CODE_SIZE) {
     exit;
 }
 
-// Whitelist and clamp args, keep them unescaped in $safeArgs.
-$safeArgs = [];
-foreach ($requestedArgs as $arg) {
-    if (is_string($arg) && preg_match($ALLOWED_ARG_PATTERN, $arg)) {
-        if (preg_match('/^-t:(\d+)$/', $arg, $tm)) {
-            $safeArgs[] = '-t:' . min((int)$tm[1], $MAX_TIMEOUT);
-        } else {
-            $safeArgs[] = $arg;
-        }
-    }
+$safeArgs = validateArgs($requestedArgs);
+// Compute before the internal -t:0 used for preprocessor output.
+$hardTimeout = jobTimeout($safeArgs);
+if ((in_array('-cpp', $safeArgs) || in_array('-cppLight', $safeArgs)) && !findTool('cc')) {
+    echo json_encode(terminalResult('ERROR', "C preprocessing requires 'cc'. Install a C compiler or set TRICERA_TOOL_PATH to its executable search path."));
+    exit;
 }
 
 // -pDot alone: suppress the image viewer with -pngNo.
@@ -70,13 +67,12 @@ file_put_contents($tmpFile, $code);
 $wantsGraphs = in_array('-pDot', $safeArgs) || in_array('-dotCEX', $safeArgs);
 
 $escapedArgs = array_map('escapeshellarg', $safeArgs);
-$triPpPath = dirname($TRICERA_PATH);
 
 // The tri invocation with resource limits (to be exec'd by a wrapper shell)
 $triInvocation = sprintf(
-    'nice -n %d timeout --signal=KILL %d prlimit --data=%d %s %s %s 2>&1',
+    'nice -n %d timeout --signal=KILL %s prlimit --data=%d %s %s %s',
     $NICE_LEVEL,
-    $HARD_TIMEOUT,
+    escapeshellarg((string)$hardTimeout),
     $MEM_LIMIT_MB * 1024 * 1024,
     escapeshellarg($TRICERA_PATH),
     implode(' ', $escapedArgs),
@@ -84,11 +80,22 @@ $triInvocation = sprintf(
 );
 
 // Result storage directory
-$resultDir = sys_get_temp_dir() . '/tricera-web-results';
+$resultDir = $RESULT_DIR;
 if (!is_dir($resultDir)) @mkdir($resultDir, 0700, true);
 $outputFile = "$resultDir/$requestId.out";
 $doneFile   = "$resultDir/$requestId.done";
 $metaFile   = "$resultDir/$requestId.meta";
+$abortFile  = "$resultDir/$requestId.abort";
+$cachedFile = "$resultDir/$requestId.json";
+if (file_exists($metaFile) || file_exists($cachedFile)) {
+    echo json_encode(terminalResult('ERROR', 'Request ID already exists. Start a new verification.'));
+    @unlink($tmpFile);
+    @rmdir($workDir);
+    exit;
+}
+foreach (glob("$resultDir/*.json") as $cached) {
+    if (filemtime($cached) < time() - 300) @unlink($cached);
+}
 
 // Save metadata for result.php to use when returning the result
 file_put_contents($metaFile, json_encode([
@@ -97,26 +104,26 @@ file_put_contents($metaFile, json_encode([
     'wantsGraphs' => $wantsGraphs,
     'code' => $code,
     'startTime' => microtime(true),
+    'hardTimeout' => $hardTimeout,
 ]));
 
-// Wrap in setsid so the whole process tree is in one process group we can kill.
-// Output goes to a file; a done marker is written on completion.
+// The worker becomes timeout itself, so its recorded PID is the workload's
+// process group. Keep the supervisor outside that group to record completion.
 if (!is_dir($PID_DIR)) @mkdir($PID_DIR, 0700, true);
 $pidFile = "$PID_DIR/$requestId.pid";
 
-$bgParts = ['cd ' . escapeshellarg($workDir)];
-$bgParts[] = 'echo $$ > ' . escapeshellarg($pidFile);
-$bgParts[] = sprintf(
-    'TRI_PP_PATH=%s DISPLAY= %s > %s 2>&1; echo $? > %s',
-    escapeshellarg($triPpPath),
-    $triInvocation,
-    escapeshellarg($outputFile),
-    escapeshellarg($doneFile)
-);
-$wrapper = implode(' && ', $bgParts);
+$worker = 'echo $$ > ' . escapeshellarg($pidFile)
+    . '; test -f ' . escapeshellarg($metaFile)
+    . ' && test ! -f ' . escapeshellarg($abortFile) . ' || exit 125'
+    . '; exec ' . $triInvocation;
+$wrapper = 'cd ' . escapeshellarg($workDir)
+    . ' && setsid sh -c ' . escapeshellarg($worker)
+    . ' > ' . escapeshellarg($outputFile) . ' 2>&1'
+    . '; code=$?; printf \'%s %s\\n\' "$code" "$(date +%s.%N)" > ' . escapeshellarg($doneFile . '.tmp')
+    . '; mv ' . escapeshellarg($doneFile . '.tmp') . ' ' . escapeshellarg($doneFile);
 $bgCmd = 'setsid sh -c ' . escapeshellarg($wrapper) . ' > /dev/null 2>&1 &';
 
 // Launch in background (returns immediately)
 exec($bgCmd);
 
-echo json_encode(['requestId' => $requestId, 'status' => 'running']);
+echo json_encode(['requestId' => $requestId, 'status' => 'running', 'timeoutSeconds' => $hardTimeout]);

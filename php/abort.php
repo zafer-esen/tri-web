@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/functions.php';
 
 $input = json_decode(file_get_contents('php://input'), true);
 $requestId = $input['requestId'] ?? '';
@@ -21,30 +22,13 @@ if ($requestId === '') {
     exit;
 }
 
-$pidFile = "$PID_DIR/$requestId.pid";
-if (!file_exists($pidFile)) {
+$metaFile = "$RESULT_DIR/$requestId.meta";
+if (!file_exists($metaFile) || file_exists("$RESULT_DIR/$requestId.done")) {
     echo json_encode(['aborted' => false, 'message' => 'No running process for that requestId']);
     exit;
 }
 
-$pid = (int)trim(file_get_contents($pidFile));
-if ($pid <= 0) {
-    echo json_encode(['aborted' => false, 'message' => 'Invalid PID in file']);
-    exit;
-}
-
-// Kill the whole process group (negative PID means PGID).
-// The verify.php wrapper uses setsid, so PID == PGID.
-if (function_exists('posix_kill')) {
-    $ok = posix_kill(-$pid, 9) || posix_kill($pid, 9);
-} else {
-    exec('kill -9 -' . escapeshellarg($pid) . ' 2>/dev/null', $o1, $r1);
-    $ok = ($r1 === 0);
-    if (!$ok) {
-        exec('kill -9 ' . escapeshellarg($pid) . ' 2>/dev/null', $o2, $r2);
-        $ok = ($r2 === 0);
-    }
-}
-
-@unlink($pidFile);
-echo json_encode(['aborted' => (bool)$ok]);
+// Mark first: the worker may still be starting and checks this before exec.
+file_put_contents("$RESULT_DIR/$requestId.abort", '1');
+signalJob($requestId, 9);
+echo json_encode(['aborted' => true]);

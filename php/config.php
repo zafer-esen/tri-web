@@ -6,10 +6,13 @@
 $TRICERA_PATH = getenv('TRICERA_PATH') ?: '/path/to/tri';
 $MAX_TIMEOUT = 60;          // max user-requested timeout (seconds)
 $HARD_TIMEOUT = 65;         // hard kill (slightly above MAX_TIMEOUT for cleanup)
+$TIMEOUT_GRACE = 1;         // per-job allowance beyond the requested timeout
+$TOOL_PATH = getenv('TRICERA_TOOL_PATH') ?: null; // optional compiler/helper search path
 $MAX_CODE_SIZE = 50000;     // bytes
 $SHARE_DIR = __DIR__ . '/../shares';
 $LOG_DIR = __DIR__ . '/../log';
 $PID_DIR = sys_get_temp_dir() . '/tricera-web-pids';
+$RESULT_DIR = sys_get_temp_dir() . '/tricera-web-results';
 $MAX_LOG_SIZE_MB = 50;      // rotate log when it exceeds this size
 $NICE_LEVEL = 19;           // lowest priority
 $MEM_LIMIT_MB = 2048;       // heap data limit for TriCera process (--data, not --as)
@@ -20,12 +23,12 @@ $ALLOWED_ARG_PATTERN = '/^-(?:arithMode:[a-z0-9]+|t:\d+(\.\d+)?|m:\w+|heapModel:
     . '|reachsafety|memsafety|valid-deref|valid-free'
     . '|valid-memtrack|valid-memcleanup|splitProperties'
     . '|cpp|cppLight|noPP'
-    . '|inv|sol|ssol|statistics'
+    . '|inv|invEncoding(?::[A-Za-z0-9-]+)?|sol|ssol|statistics'
     . '|sym|sym:bfs|sym:dfs|symDepth:\d+'
     . '|abstract:\w+|abstractTO:\d+(\.\d+)?|abstractPO'
     . '|disj|noSlicing|solutionReconstruction:\w+'
     . '|splitClauses:\d+'
-    . '|forceNondetInit|mathArrays)$/';
+    . '|forceNondetInit|mathArrays)$/D';
 
 // Load local overrides if present (gitignored)
 $localConfig = __DIR__ . '/config.local.php';

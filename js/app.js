@@ -35,9 +35,11 @@
     });
 
     fetch('api/config').then(r => r.json()).then(config => {
+      OptionsPanel.setMaxTimeout(config.maxTimeout);
+      OptionsPanel.setInvariantEncodings(config.invariantEncodings);
       if (config.version)
         document.querySelector('.version').textContent = 'v' + config.version;
-    }).catch(() => {});
+    }).catch(() => OptionsPanel.setInvariantEncodings([]));
   });
 
   const DEFAULT_CODE = `// Press Ctrl+Enter or click "Verify" to check this program.

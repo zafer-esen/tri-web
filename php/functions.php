@@ -1,5 +1,103 @@
 <?php
 
+function configureToolEnvironment() {
+    global $TOOL_PATH, $TRICERA_PATH;
+    $paths = explode(PATH_SEPARATOR, $TOOL_PATH ?? (getenv('PATH') ?: ''));
+    $paths = array_unique(array_filter(array_merge($paths, ['/usr/local/bin', '/usr/bin', '/bin']), 'strlen'));
+    putenv('PATH=' . implode(PATH_SEPARATOR, $paths));
+    putenv('DISPLAY=');
+    $configured = getenv('TRI_PP_PATH');
+    if ($configured === false || $configured === '') {
+        $triDir = dirname(realpath($TRICERA_PATH) ?: $TRICERA_PATH);
+        $directories = [$triDir . '/dist', $triDir];
+        $onPath = findTool('tri-pp');
+        if ($onPath) $directories[] = dirname($onPath);
+        $checkout = dirname($triDir) . '/tri-pp';
+        $directories[] = $checkout;
+        $directories[] = $checkout . '/build';
+        foreach ($directories as $directory) {
+            $executable = $directory . '/tri-pp';
+            if (is_file($executable) && is_executable($executable)) {
+                putenv('TRI_PP_PATH=' . realpath($directory));
+                break;
+            }
+        }
+    }
+}
+
+function findTool($name) {
+    foreach (explode(PATH_SEPARATOR, getenv('PATH') ?: '') as $directory) {
+        $path = $directory . '/' . $name;
+        if ($directory !== '' && is_file($path) && is_executable($path)) return $path;
+    }
+    return null;
+}
+
+function parseInvariantEncodings($helpOutput) {
+    $lines = preg_split('/\R/', $helpOutput);
+    foreach ($lines as $index => $line) {
+        if (!preg_match('/^\s*-invEncoding\[:\w+\]\s/', $line)) continue;
+        $names = [];
+        foreach (array_slice($lines, $index + 1) as $line) {
+            $line = rtrim(trim($line), ',');
+            if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9-]*(?:\s*,\s*[A-Za-z0-9][A-Za-z0-9-]*)*$/D', $line)) break;
+            foreach (explode(',', $line) as $name) {
+                $name = trim($name);
+                if ($name !== 'default') $names[] = $name;
+            }
+        }
+        return array_values(array_unique($names));
+    }
+    return [];
+}
+
+function validateArgs($args) {
+    global $ALLOWED_ARG_PATTERN, $MAX_TIMEOUT;
+    $safeArgs = [];
+    foreach ($args as $arg) {
+        if (is_string($arg) && preg_match($ALLOWED_ARG_PATTERN, $arg)) {
+            if (preg_match('/^-t:(\d+(?:\.\d+)?)$/D', $arg, $m)) {
+                $arg = '-t:' . min((float)$m[1], $MAX_TIMEOUT);
+            }
+            $safeArgs[] = $arg;
+        }
+    }
+    return $safeArgs;
+}
+
+function jobTimeout($args) {
+    global $MAX_TIMEOUT, $HARD_TIMEOUT, $TIMEOUT_GRACE;
+    $requested = $MAX_TIMEOUT;
+    foreach ($args as $arg) {
+        if (strpos($arg, '-t:') === 0) $requested = (float)substr($arg, 3);
+    }
+    return min($HARD_TIMEOUT, max(1, $requested) + $TIMEOUT_GRACE);
+}
+
+function terminalResult($status, $message) {
+    return ['status' => $status, 'message' => $message, 'diagnostics' => []];
+}
+
+function jobPid($requestId) {
+    global $PID_DIR;
+    $file = "$PID_DIR/$requestId.pid";
+    return is_file($file) ? (int)trim(file_get_contents($file)) : 0;
+}
+
+function signalJob($requestId, $signal) {
+    $pid = jobPid($requestId);
+    if ($pid <= 1) return false;
+    if (function_exists('posix_kill')) return @posix_kill(-$pid, $signal);
+    exec('kill -' . (int)$signal . ' -' . $pid . ' 2>/dev/null', $unused, $exitCode);
+    return $exitCode === 0;
+}
+
+function writeJsonAtomically($path, $value) {
+    $tmp = $path . '.' . uniqid() . '.tmp';
+    file_put_contents($tmp, json_encode($value));
+    rename($tmp, $path);
+}
+
 function logSubmission($code, $args, $status, $elapsedMs) {
     global $LOG_DIR, $MAX_LOG_SIZE_MB;
     if (!$LOG_DIR) return;
@@ -52,7 +150,9 @@ function parseTriceraOutput($output, $args = []) {
         'preprocessorOutput' => null,
     ];
 
-    if (in_array('-p', $args) || in_array('-pDot', $args) || in_array('-sp', $args)) {
+    $failed = preg_match('/^(?:.*Error:|Out of Memory|Stack Overflow)/m', $output);
+    $timedOut = preg_match('/^TIMEOUT\s*$/m', $output);
+    if (!$failed && !$timedOut && (in_array('-p', $args) || in_array('-pDot', $args) || in_array('-sp', $args))) {
         $result['status'] = 'INFO';
         $result['message'] = 'Horn clauses generated (no verification).';
         if (preg_match('/^(.*?)(System predicates:)/ms', $output, $m)) {
@@ -71,7 +171,7 @@ function parseTriceraOutput($output, $args = []) {
         } else {
             $result['preprocessorOutput'] = trim($output);
         }
-        if (in_array('-t:0', $args)) {
+        if (in_array('-t:0', $args) && !$failed) {
             $result['status'] = 'INFO';
             $result['message'] = 'Preprocessor output generated (verification skipped).';
             return $result;

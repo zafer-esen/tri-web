@@ -125,6 +125,8 @@ body {
   font-weight: 500;
 }
 .examples-group-header.collapsible:hover { background: var(--bg-tertiary); }
+.examples-group-header::-webkit-details-marker { display: none; }
+.examples-group[open] > summary .examples-group-arrow { transform: rotate(90deg); }
 .examples-group-arrow {
   font-size: 9px;
   color: var(--text-muted);
@@ -224,6 +226,7 @@ body {
 .status-bar.error { background: var(--error-orange); }
 .status-bar.timeout { background: var(--warning-yellow); }
 .status-bar.unknown { background: var(--text-muted); }
+.status-bar.aborted { background: var(--text-muted); }
 .status-bar.verifying {
   background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-blue-hover) 50%, var(--accent-blue) 100%);
   background-size: 200% 100%;
@@ -272,6 +275,7 @@ body {
 .output-status.unsafe { background: rgba(248,81,73,0.15); color: var(--unsafe-red); }
 .output-status.error { background: rgba(240,136,62,0.15); color: var(--error-orange); }
 .output-status.timeout { background: rgba(210,153,34,0.15); color: var(--warning-yellow); }
+.output-status.aborted { color: var(--text-muted); }
 .output-status.unknown { background: rgba(150,150,150,0.15); color: var(--text-secondary); }
 .output-status.info { background: rgba(0,122,204,0.15); color: var(--accent-blue); }
 .status-bar.info { background: var(--accent-blue); }

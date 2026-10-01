@@ -4,6 +4,7 @@ header('Access-Control-Allow-Origin: *');
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/functions.php';
+configureToolEnvironment();
 
 $requestId = preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'] ?? '');
 if ($requestId === '') {
@@ -12,51 +13,72 @@ if ($requestId === '') {
     exit;
 }
 
-$resultDir = sys_get_temp_dir() . '/tricera-web-results';
+$resultDir = $RESULT_DIR;
 $outputFile = "$resultDir/$requestId.out";
 $doneFile   = "$resultDir/$requestId.done";
 $metaFile   = "$resultDir/$requestId.meta";
+$abortFile  = "$resultDir/$requestId.abort";
+$cachedFile = "$resultDir/$requestId.json";
 
-if (!file_exists($doneFile)) {
-    if (file_exists($metaFile)) {
-        echo json_encode(['status' => 'running']);
-    } else {
-        http_response_code(404);
-        echo json_encode(['status' => 'not_found', 'message' => 'No result for this request ID']);
-    }
+if (file_exists($cachedFile)) {
+    readfile($cachedFile);
     exit;
 }
 
-$rawOutput = file_exists($outputFile) ? file_get_contents($outputFile) : '';
 $meta = file_exists($metaFile) ? json_decode(file_get_contents($metaFile), true) : [];
+$startTime = $meta['startTime'] ?? microtime(true);
+$deadline = $startTime + ($meta['hardTimeout'] ?? $HARD_TIMEOUT);
+$forcedResult = null;
+
+if (!file_exists($doneFile)) {
+    if (!$meta) {
+        http_response_code(404);
+        echo json_encode(['status' => 'not_found', 'message' => 'No result for this request ID']);
+        exit;
+    }
+    if (microtime(true) > $deadline + 2) {
+        signalJob($requestId, 9);
+        $forcedResult = terminalResult('TIMEOUT', 'Verification timed out.');
+    } elseif (microtime(true) > $startTime + 5 && !signalJob($requestId, 0)) {
+        $forcedResult = terminalResult('ERROR', 'Verification stopped without a result.');
+    } else {
+        echo json_encode(['status' => 'running']);
+        exit;
+    }
+}
+
+$rawOutput = file_exists($outputFile) ? file_get_contents($outputFile) : '';
 $safeArgs = $meta['args'] ?? [];
 $wantsGraphs = $meta['wantsGraphs'] ?? false;
 $workDir = $meta['workDir'] ?? '';
 $code = $meta['code'] ?? '';
-$startTime = $meta['startTime'] ?? microtime(true);
-clearstatcache(true, $doneFile);
-$elapsed = max(0, round((filemtime($doneFile) - (int)$startTime) * 1000));
+$completion = file_exists($doneFile) ? preg_split('/\s+/', trim(file_get_contents($doneFile))) : [];
+$finished = isset($completion[1]) ? (float)$completion[1] : microtime(true);
+$elapsed = max(0, round(($finished - $startTime) * 1000));
+$exitCode = (int)($completion[0] ?? -1);
 
-$exitCode = (int)trim(file_get_contents($doneFile));
-if ($exitCode === 137) {
-    $result = [
-        'status' => 'ABORTED',
-        'message' => 'Verification aborted by user.',
-        'diagnostics' => [],
-        'rawOutput' => $rawOutput,
-        'elapsedMs' => $elapsed,
-    ];
+if (file_exists($abortFile)) {
+    $result = terminalResult('ABORTED', 'Verification aborted by user.');
+} elseif ($forcedResult) {
+    $result = $forcedResult;
+} elseif ($exitCode === 124 || ($exitCode === 137 && $finished >= $deadline)) {
+    $result = terminalResult('TIMEOUT', 'Verification timed out.');
 } else {
     $result = parseTriceraOutput($rawOutput, $safeArgs);
-    $result['rawOutput'] = $rawOutput;
-    $result['elapsedMs'] = $elapsed;
+    if ($exitCode !== 0 && in_array($result['status'], ['INFO', 'UNKNOWN'])) {
+        $result = terminalResult('ERROR', "TriCera exited with status $exitCode.");
+    }
 }
+$result['rawOutput'] = $rawOutput;
+$result['elapsedMs'] = $elapsed;
 
-if ($wantsGraphs && $workDir && is_dir($workDir)) {
+if ($wantsGraphs && !in_array($result['status'], ['TIMEOUT', 'ABORTED', 'ERROR']) && $workDir && is_dir($workDir)) {
     $result['graphImages'] = collectGraphImages($workDir);
 }
 
 logSubmission($code, $safeArgs, $result['status'] ?? '?', $elapsed);
+// Keep terminal responses briefly so a lost response can be polled again.
+writeJsonAtomically($cachedFile, $result);
 
 // Clean up temporary files
 if ($workDir && is_dir($workDir)) {
@@ -66,6 +88,7 @@ if ($workDir && is_dir($workDir)) {
 @unlink($outputFile);
 @unlink($doneFile);
 @unlink($metaFile);
+@unlink($abortFile);
 $pidFile = "$PID_DIR/$requestId.pid";
 @unlink($pidFile);
 

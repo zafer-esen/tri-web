@@ -40,8 +40,8 @@ const OutputPanel = {
       this.statusEl.textContent = '';
       return;
     }
-    const labels = { safe: 'SAFE', unsafe: 'UNSAFE', timeout: 'TIMEOUT', error: 'ERROR', unknown: 'UNKNOWN', info: 'INFO' };
-    const icons = { safe: '\u2713', unsafe: '\u2717', info: '\u2139', timeout: '\u23F1', error: '\u26A0', unknown: '?' };
+    const labels = { safe: 'SAFE', unsafe: 'UNSAFE', timeout: 'TIMEOUT', aborted: 'ABORTED', error: 'ERROR', unknown: 'UNKNOWN', info: 'INFO' };
+    const icons = { safe: '\u2713', unsafe: '\u2717', info: '\u2139', timeout: '\u23F1', aborted: '\u25A0', error: '\u26A0', unknown: '?' };
     const label = labels[status] || status.toUpperCase();
     const icon = icons[status] || '';
     const time = elapsedMs ? ` (${(elapsedMs / 1000).toFixed(1)}s)` : '';
